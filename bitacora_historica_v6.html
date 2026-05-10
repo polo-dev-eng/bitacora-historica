@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a1a2e">
+<title>Bitácora Histórica</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQml0w6Fjb3JhIEhpc3TDs3JpY2EiLCJzaG9ydF9uYW1lIjoiQml0w6Fjb3JhIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzFhMWEyZSIsInRoZW1lX2NvbG9yIjoiIzFhMWEyZSIsInN0YXJ0X3VybCI6Ii4ifQ==">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg2:#f5f5f3;--bg3:#eceae5;
+  --text:#1a1a1a;--text2:#444;--text3:#888;
+  --border:#ddd;--border2:#aaa;
+  --gold:#b8922a;--gold-bg:#fdf3e0;--gold-border:#e8c06a;
+  --info:#185FA5;--info-bg:#e6f1fb;--info-border:#85b7eb;
+  --danger:#a32d2d;--danger-bg:#fcebeb;--danger-border:#f09595;
+  --success:#2d6b2d;--success-bg:#e8f5e8;--success-border:#80c880;
+  --warn:#7a4a00;--warn-bg:#fff3e0;--warn-border:#ffb74d;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#18181a;--bg2:#242426;--bg3:#2e2e32;
+    --text:#f2f2f5;--text2:#c0c0cc;--text3:#6a6a78;
+    --border:#38383f;--border2:#58585f;
+    --gold:#f0c84a;--gold-bg:#2e2408;--gold-border:#c8960a;
+    --info:#5aabdf;--info-bg:#0a1e30;--info-border:#1e5fa5;
+    --danger:#e06060;--danger-bg:#2a0808;--danger-border:#a02020;
+    --success:#60c060;--success-bg:#082808;--success-border:#206020;
+    --warn:#e0a040;--warn-bg:#281800;--warn-border:#a06010;
+  }
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* LOGIN SCREEN */
+#login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:20px;padding:40px}
+.login-logo{width:72px;height:72px;border-radius:16px;background:var(--gold-bg);border:2px solid var(--gold-border);display:flex;align-items:center;justify-content:center}
+.login-logo i{font-size:36px;color:var(--gold)}
+.login-title{font-size:28px;font-weight:700;color:var(--text);text-align:center}
+.login-sub{font-size:14px;color:var(--text3);text-align:center;max-width:320px;line-height:1.6}
+.google-btn{display:flex;align-items:center;gap:10px;padding:12px 24px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;font-size:14px;font-weight:500;transition:all .2s;margin-top:8px}
+.google-btn:hover{border-color:var(--border2);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.google-btn img{width:20px;height:20px}
+.login-note{font-size:11px;color:var(--text3);text-align:center;max-width:280px;line-height:1.5}
+
+/* SYNC INDICATOR */
+.sync-bar{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text3);padding:2px 8px;border-radius:20px;background:var(--bg2);border:1px solid var(--border)}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--success);flex-shrink:0}
+.sync-dot.syncing{background:var(--gold);animation:blink .8s infinite}
+.sync-dot.offline{background:var(--danger)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+#app{display:flex;flex:1;overflow:hidden;position:relative;display:none}
+
+/* SIDEBAR */
+.sidebar{width:52px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:2px;flex-shrink:0;z-index:10;overflow-y:auto;overflow-x:hidden}
+.logo{width:32px;height:32px;border-radius:8px;background:var(--gold-bg);border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;margin-bottom:8px;cursor:pointer;flex-shrink:0}
+.logo i{font-size:17px;color:var(--gold)}
+.nb{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;color:var(--text3);transition:all .15s;position:relative;flex-shrink:0}
+.nb:hover{background:var(--bg3);color:var(--text2)}
+.nb.active{background:var(--bg);color:var(--text);border:1px solid var(--border)}
+.nb i{font-size:18px}
+.nb .dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--gold);border:2px solid var(--bg2);display:none}
+.nb .dot.show{display:block}
+.tip{position:absolute;left:44px;background:var(--text);color:var(--bg);font-size:11px;padding:3px 8px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:200}
+.nb:hover .tip{opacity:1}
+.nsep{width:26px;height:1px;background:var(--border);margin:3px 0;flex-shrink:0}
+.user-avatar{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid var(--border);overflow:hidden;flex-shrink:0;margin-top:auto;margin-bottom:4px}
+.user-avatar img{width:100%;height:100%;object-fit:cover}
+.user-avatar-placeholder{width:28px;height:28px;border-radius:50%;background:var(--gold-bg);border:2px solid var(--gold-border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:auto;margin-bottom:4px}
+.user-avatar-placeholder i{font-size:14px;color:var(--gold)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;min-width:0}
+.topbar{display:flex;align-items:center;gap:7px;padding:9px 13px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg);flex-wrap:wrap}
+.topbar-title{font-size:14px;font-weight:600;flex:1;min-width:80px}
+.topbar-sub{font-size:11px;color:var(--text3)}
+.btn-p{padding:6px 13px;border-radius:8px;background:var(--text);color:var(--bg);border:none;cursor:pointer;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:5px;transition:opacity .15s;white-space:nowrap}
+.btn-p:hover{opacity:.85}
+.btn-s{padding:6px 11px;border-radius:8px;background:var(--bg2);color:var(--text2);border:1px solid var(--border);cursor:pointer;font-size:12px;display:inline-flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap}
+.btn-s:hover{border-color:var(--border2);color:var(--text)}
+.btn-d{padding:6px 11px;border-radius:8px;background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border);cursor:pointer;font-size:12px;display:inline-flex;align-items:center;gap:5px;font-weight:500}
+.btn-d:hover{background:var(--danger);color:white}
+.btn-cancel{padding:6px 11px;border-radius:8px;background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border);cursor:pointer;font-size:12px;display:inline-flex;align-items:center;gap:5px;font-weight:500;transition:all .15s}
+.btn-cancel:hover{background:var(--danger);color:white}
+.sel{font-size:11px;padding:4px 7px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--text);outline:none}
+.sel:focus{border-color:var(--gold)}
+
+.screen{display:none;flex:1;overflow:hidden;flex-direction:column}
+.screen.active{display:flex}
+.sbody{padding:13px;flex:1;overflow-y:auto;padding-bottom:80px}
+
+/* FORMS */
+.flabel{font-size:10px;font-weight:600;color:var(--text3);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.05em}
+.fg{margin-bottom:12px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+input,select,textarea{width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+textarea{resize:vertical;min-height:64px;line-height:1.5}
+.chip-wrap{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.chip{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);cursor:pointer;color:var(--text2);background:transparent;transition:all .15s;display:inline-flex;align-items:center;gap:4px;user-select:none}
+.chip i{font-size:13px}
+.chip.on{background:var(--gold-bg);color:var(--gold);border-color:var(--gold-border)}
+.form-actions{display:flex;gap:8px;padding:11px 13px;border-top:1px solid var(--border);background:var(--bg);flex-shrink:0}
+.form-actions .btn-p{flex:1;justify-content:center;padding:9px}
+.form-actions .btn-cancel{padding:9px 15px}
+
+/* AI FILL */
+.ai-fill-bar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:9px;margin-bottom:12px}
+.ai-fill-bar i{font-size:16px;color:var(--gold);flex-shrink:0}
+.ai-fill-bar span{font-size:12px;color:var(--gold);flex:1}
+.ai-fill-btn{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--gold-border);background:var(--bg);color:var(--gold);cursor:pointer;white-space:nowrap}
+.ai-fill-btn:hover{background:var(--gold-border)}
+.ai-fill-btn.loading{opacity:.5;pointer-events:none}
+
+/* MONTH PICKER */
+.month-wrap{position:relative;flex:1}
+.month-inp{cursor:pointer}
+.month-drop{position:absolute;top:calc(100% + 3px);left:0;min-width:160px;background:var(--bg);border:1px solid var(--border);border-radius:9px;z-index:100;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.2);display:none}
+.month-drop.open{display:block}
+.month-search{padding:7px 10px;font-size:12px;width:100%;border:none;border-bottom:1px solid var(--border);outline:none;background:var(--bg);color:var(--text)}
+.month-list{max-height:180px;overflow-y:auto}
+.month-opt{padding:6px 10px;font-size:12px;cursor:pointer;color:var(--text);transition:background .1s}
+.month-opt:hover,.month-opt.hi{background:var(--gold-bg);color:var(--gold)}
+.month-opt.selected{background:var(--gold-bg);color:var(--gold);font-weight:600}
+
+/* TERRITORY AUTOCOMPLETE */
+.terr-wrap{position:relative}
+.terr-drop{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--bg);border:1px solid var(--border);border-radius:9px;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,.2);display:none;max-height:220px;overflow-y:auto}
+.terr-drop.open{display:block}
+.terr-opt{padding:7px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:7px;color:var(--text)}
+.terr-opt:hover{background:var(--bg2)}
+.terr-opt i{font-size:13px;color:var(--text3)}
+.terr-opt .tsub{font-size:10px;color:var(--text3);margin-left:auto}
+
+/* DATE HINT */
+.date-hint{font-size:10px;color:var(--text3);margin-top:3px}
+
+/* MEDIA */
+.media-section{background:var(--bg2);border-radius:9px;padding:10px;border:1px solid var(--border)}
+.media-group{margin-bottom:8px}
+.media-group:last-child{margin-bottom:0}
+.media-group-hd{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
+.media-item{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.media-item:last-child{margin-bottom:0}
+.media-lbl{font-size:10px;padding:2px 7px;border-radius:20px;background:var(--bg);border:1px solid var(--border);color:var(--text2);white-space:nowrap;width:72px;text-align:center;flex-shrink:0}
+.media-item input{flex:1;font-size:12px}
+.add-media-btn{font-size:10px;padding:2px 8px;border-radius:20px;border:1px dashed var(--border);background:transparent;color:var(--text3);cursor:pointer;display:inline-flex;align-items:center;gap:3px}
+.add-media-btn:hover{border-color:var(--gold);color:var(--gold)}
+.rm-btn{width:20px;height:20px;border-radius:50%;border:none;background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.rm-btn:hover{color:var(--danger)}
+
+/* TAGS */
+.tag{font-size:10px;padding:2px 8px;border-radius:20px;border:1px solid;display:inline-block;white-space:nowrap;font-weight:500}
+.tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.mpill{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:2px 8px;border-radius:20px;background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
+.mpill i{font-size:11px}
+
+/* TIMELINE */
+.tl-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;color:var(--text3);padding:40px;text-align:center}
+.tl-empty i{font-size:44px}
+.tl-empty p{font-size:13px;max-width:220px;line-height:1.6}
+.tl-wrap{position:relative;padding-left:84px;padding-bottom:24px}
+.tl-spine{position:absolute;left:74px;top:0;bottom:0;width:2px;background:var(--border)}
+.tl-entry{position:relative;margin-bottom:12px;cursor:pointer}
+.tl-year{position:absolute;left:-84px;width:72px;text-align:right;font-size:10px;color:var(--text3);top:8px;font-weight:500;line-height:1.3}
+.tl-dot{position:absolute;left:-14px;top:8px;width:12px;height:12px;border-radius:50%;border:2px solid var(--bg);z-index:2;transition:transform .15s}
+.tl-entry:hover .tl-dot{transform:scale(1.4)}
+.tl-card{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;transition:border-color .15s}
+.tl-card:hover{border-color:var(--border2)}
+.tl-card.bookmarked{border-left:3px solid var(--gold)}
+.tl-card-head{display:flex;align-items:flex-start;gap:7px;margin-bottom:2px}
+.tl-title{font-size:13px;font-weight:600;flex:1;line-height:1.4}
+.tl-desc{font-size:11px;color:var(--text2);line-height:1.5;margin-top:3px}
+.type-badge{font-size:9px;padding:2px 7px;border-radius:10px;border:1px solid;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;margin-top:2px;font-weight:600}
+.bm-btn{background:none;border:none;cursor:pointer;padding:2px;color:var(--text3);transition:color .15s;flex-shrink:0}
+.bm-btn:hover,.bm-btn.on{color:var(--gold)}
+.bm-btn i{font-size:15px}
+
+/* TOOLTIP */
+.tl-tooltip{display:none;position:absolute;left:calc(100% + 12px);top:0;width:210px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px;box-shadow:0 4px 20px rgba(0,0,0,.15);z-index:50;pointer-events:none}
+.tl-entry:hover .tl-tooltip{display:block}
+.tt-thumb{width:100%;height:70px;background:var(--bg2);border-radius:6px;margin-bottom:6px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.tt-thumb img{width:100%;height:100%;object-fit:cover}
+.tt-thumb i{font-size:26px;color:var(--text3)}
+.tt-title{font-size:12px;font-weight:600;margin-bottom:3px}
+.tt-body{font-size:11px;color:var(--text2);line-height:1.5}
+
+/* HTL */
+#htl-outer{background:var(--bg2);border-radius:10px;border:1.5px solid var(--border);margin-bottom:9px;overflow:hidden;flex-shrink:0}
+#htl-canvas{position:relative;height:155px;cursor:grab;user-select:none;overflow:hidden}
+#htl-canvas.grabbing{cursor:grabbing}
+.htl-controls{display:flex;align-items:center;gap:7px;padding:6px 11px;border-top:1px solid var(--border);flex-wrap:wrap;background:var(--bg2)}
+.htl-zoom-row{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.htl-zoom-row button{width:22px;height:22px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.htl-zoom-row button:hover{background:var(--bg3)}
+.htl-preset-btns{display:flex;gap:4px}
+.htl-preset{font-size:10px;padding:2px 8px;border-radius:20px;border:1px solid var(--border);cursor:pointer;background:var(--bg);color:var(--text2);transition:all .15s}
+.htl-preset:hover,.htl-preset.active{border-color:var(--gold);color:var(--gold);background:var(--gold-bg)}
+.layer-row{display:flex;gap:4px;flex-wrap:wrap}
+.layer-btn{font-size:10px;padding:2px 8px;border-radius:20px;border:1.5px solid var(--border);cursor:pointer;background:var(--bg);color:var(--text2);display:inline-flex;align-items:center;gap:3px;transition:all .15s}
+.layer-btn.on{border-color:currentColor;font-weight:600}
+.layer-btn i{font-size:11px}
+
+/* TIME NAVIGATOR */
+.time-nav{display:flex;align-items:center;gap:6px;padding:6px 11px;border-top:1px solid var(--border);background:var(--bg2);flex-wrap:wrap}
+.time-nav-lbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.era-btn{font-size:10px;padding:3px 9px;border-radius:20px;border:1px solid var(--border);cursor:pointer;background:var(--bg);color:var(--text2);transition:all .15s;white-space:nowrap}
+.era-btn:hover{border-color:var(--gold);color:var(--gold)}
+.tnav-inp{display:flex;align-items:center;gap:4px}
+.tnav-inp input{width:90px;font-size:12px;padding:4px 7px;text-align:center}
+.tnav-inp button{padding:4px 9px;font-size:11px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer}
+.tnav-inp button:hover{border-color:var(--gold);color:var(--gold)}
+
+/* FILTER PANEL */
+.filter-panel{background:var(--bg2);border-radius:9px;border:1.5px solid var(--border);padding:10px;margin-bottom:9px;display:none}
+.filter-panel.open{display:block}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:7px}
+.filter-row:last-child{margin-bottom:0}
+.filter-lbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;min-width:68px}
+.tfc{font-size:11px;padding:3px 9px;border-radius:20px;border:1.5px solid var(--border);cursor:pointer;background:var(--bg);color:var(--text2);display:inline-flex;align-items:center;gap:4px;transition:all .15s}
+.tfc.on{background:var(--info-bg);color:var(--info);border-color:var(--info-border)}
+.tfc i{font-size:11px}
+
+/* DETAIL PANEL */
+.detail-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,.25);z-index:20}
+.detail-overlay.open{display:block}
+.detail-panel{position:absolute;top:0;right:0;bottom:0;width:360px;background:var(--bg);border-left:1.5px solid var(--border);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s;z-index:21;box-shadow:-4px 0 24px rgba(0,0,0,.15)}
+.detail-panel.open{transform:translateX(0)}
+.dp-hd{padding:11px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;flex-shrink:0}
+.dp-body{flex:1;overflow-y:auto;padding:13px}
+.dsec{margin-bottom:14px}
+.dsec-title{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.detail-note{font-size:12px;color:var(--text2);line-height:1.6;padding:8px 10px;background:var(--bg2);border-left:3px solid var(--border2)}
+.ai-btn{display:flex;align-items:center;gap:7px;font-size:12px;padding:7px 11px;border-radius:8px;background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border);cursor:pointer;width:100%;margin-bottom:5px;transition:all .15s;text-align:left}
+.ai-btn:hover{background:var(--gold-border)}
+.ai-btn.loading{opacity:.5;pointer-events:none}
+.ai-btn i{font-size:14px;flex-shrink:0}
+.ai-out{font-size:12px;color:var(--text2);line-height:1.7;padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);display:none;white-space:pre-wrap;margin-top:4px}
+.ai-out.show{display:block}
+.ref-card{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--bg2);border-radius:7px;border:1px solid var(--border);margin-bottom:4px}
+.ref-lbl{font-size:9px;padding:2px 6px;border-radius:10px;background:var(--bg);border:1px solid var(--border);color:var(--text3);white-space:nowrap;flex-shrink:0}
+.suggest-item{display:flex;align-items:flex-start;gap:8px;padding:7px 9px;background:var(--bg2);border-radius:7px;border:1px solid var(--border);margin-bottom:4px}
+.suggest-add{font-size:10px;padding:3px 8px;border-radius:20px;border:1px solid var(--gold-border);background:var(--gold-bg);color:var(--gold);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.cred-g{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border);font-size:9px;padding:1px 6px;border-radius:10px;display:inline-block;font-weight:600}
+.cred-y{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border);font-size:9px;padding:1px 6px;border-radius:10px;display:inline-block;font-weight:600}
+.cred-r{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border);font-size:9px;padding:1px 6px;border-radius:10px;display:inline-block;font-weight:600}
+.btn-icon{background:none;border:none;cursor:pointer;color:var(--text3);display:flex;align-items:center;padding:4px;border-radius:6px;transition:all .15s}
+.btn-icon:hover{background:var(--bg2);color:var(--text)}
+.btn-icon i{font-size:17px}
+.conn-item{display:flex;align-items:center;gap:8px;padding:6px 9px;background:var(--bg2);border-radius:7px;border:1px solid var(--border);margin-bottom:4px;cursor:pointer}
+.conn-item:hover{border-color:var(--border2)}
+
+/* VOICE */
+.voice-zone{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px;background:var(--bg2);border-radius:11px;border:1px solid var(--border);margin-bottom:13px}
+.vbtn{width:52px;height:52px;border-radius:50%;background:var(--gold-bg);border:2px solid var(--gold-border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+.vbtn:hover{transform:scale(1.05)}
+.vbtn i{font-size:22px;color:var(--gold)}
+.vbtn.recording{background:#fcebeb;border-color:#e24b4a;animation:pulse 1s infinite}
+.vbtn.recording i{color:#e24b4a}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.vstatus{font-size:12px;color:var(--text3);text-align:center;max-width:280px;line-height:1.4}
+.vtranscript{font-size:12px;color:var(--text2);background:var(--bg);border-radius:8px;padding:8px 10px;border:1px solid var(--border);width:100%;line-height:1.6;font-style:italic}
+
+/* ME */
+.me-card{background:var(--bg2);border-radius:12px;border:1.5px solid var(--gold-border);padding:16px;margin-bottom:14px}
+.me-card-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.me-avatar-big{width:52px;height:52px;border-radius:50%;background:var(--gold-bg);border:2px solid var(--gold-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.me-avatar-big img{width:100%;height:100%;object-fit:cover}
+.me-avatar-big i{font-size:24px;color:var(--gold)}
+
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:14px}
+.stat-card{background:var(--bg2);border-radius:9px;padding:11px 13px;border:1px solid var(--border)}
+.stat-num{font-size:24px;font-weight:700;color:var(--text);line-height:1}
+.stat-lbl{font-size:11px;color:var(--text3);margin-top:3px}
+
+/* FLASHCARD */
+.flashcard{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:24px;text-align:center;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:all .2s;margin-bottom:12px}
+.flashcard:hover{border-color:var(--border2)}
+.flashcard-q{font-size:14px;font-weight:500;color:var(--text);line-height:1.5;max-width:400px}
+.flashcard-a{font-size:13px;color:var(--text2);line-height:1.6;max-width:400px;display:none}
+.flashcard.flipped .flashcard-a{display:block}
+.flashcard.flipped .flashcard-q{color:var(--text3);font-size:12px}
+
+/* CONFIG */
+.cfg-card{background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:12px 14px;margin-bottom:8px}
+.cfg-title{font-size:13px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.cfg-title i{font-size:16px;color:var(--gold)}
+.cfg-desc{font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:8px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.toggle{position:relative;width:36px;height:20px;cursor:pointer;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;border-radius:10px;background:var(--border2);transition:.2s}
+.toggle input:checked+.toggle-track{background:var(--gold)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:white;transition:.2s;pointer-events:none}
+.toggle input:checked~.toggle-thumb{left:19px}
+
+/* TOAST — top center, no overlap */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-60px);background:var(--text);color:var(--bg);padding:7px 16px;border-radius:20px;font-size:12px;font-weight:500;z-index:400;transition:transform .3s;pointer-events:none;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* FAB */
+.fab{position:fixed;bottom:22px;right:22px;z-index:50;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.fab-btn{width:50px;height:50px;border-radius:50%;background:var(--gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(184,146,42,.4);transition:all .2s;color:white}
+.fab-btn:hover{transform:scale(1.08)}
+.fab-btn i{font-size:22px}
+.fab-lbl{background:var(--text);color:var(--bg);font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap;pointer-events:none}
+
+/* MODALS */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:80;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal-bg.center{align-items:center}
+.modal{background:var(--bg);border-radius:16px 16px 0 0;width:100%;max-width:600px;padding:18px 18px 28px;border:1px solid var(--border);border-bottom:none;max-height:90vh;overflow-y:auto}
+.modal.center-modal{border-radius:14px;border:1px solid var(--border);max-width:580px;width:90%;border-bottom:1px solid var(--border)}
+.modal-hd{font-size:14px;font-weight:600;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between}
+
+@media(max-width:600px){
+  .sidebar{width:44px}
+  .detail-panel{width:100%;border-left:none}
+  .fgrid{grid-template-columns:1fr}
+  .fab{bottom:14px;right:14px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-logo"><i class="ti ti-timeline"></i></div>
+  <div class="login-title">Bitácora Histórica</div>
+  <div class="login-sub">Tu registro personal del aprendizaje histórico. Sincronizado en todos tus dispositivos.</div>
+  <button class="google-btn" onclick="signInWithGoogle()">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+    Continuar con Google
+  </button>
+  <div class="login-note">Tus datos se guardan de forma segura en tu cuenta de Google. Solo vos podés verlos.</div>
+</div>
+
+<div id="app">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo" onclick="nav('bitacora')"><i class="ti ti-timeline"></i></div>
+  <div class="nb active" id="nav-bitacora" onclick="nav('bitacora')"><i class="ti ti-notebook"></i><span class="tip">Bitácora</span></div>
+  <div class="nb" id="nav-pendientes" onclick="nav('pendientes')"><i class="ti ti-list-check"></i><span class="tip">Pendientes</span><span class="dot" id="pend-dot"></span></div>
+  <div class="nb" id="nav-yo" onclick="nav('yo')"><i class="ti ti-user-circle"></i><span class="tip">Yo en la historia</span></div>
+  <div class="nsep"></div>
+  <div class="nb" id="nav-estudio" onclick="nav('estudio')"><i class="ti ti-cards"></i><span class="tip">Modo estudio</span></div>
+  <div class="nb" id="nav-stats" onclick="nav('stats')"><i class="ti ti-chart-bar"></i><span class="tip">Estadísticas</span></div>
+  <div class="nsep"></div>
+  <div class="nb" id="nav-agregar" onclick="nav('agregar');prepareForm('suceso')"><i class="ti ti-plus"></i><span class="tip">Nueva entrada</span></div>
+  <div class="nsep"></div>
+  <div class="nb" id="nav-config" onclick="nav('config')"><i class="ti ti-settings"></i><span class="tip">Configuración</span></div>
+  <div class="nb" style="opacity:.35" onclick="showToast('Colaborar — próximamente')"><i class="ti ti-users"></i><span class="tip">Colaborar (próximamente)</span></div>
+  <div class="user-avatar-placeholder" id="user-avatar" onclick="showUserMenu()" title="Mi cuenta" style="margin-top:auto"></div>
+</div>
+
+<div class="main">
+
+<!-- BITÁCORA -->
+<div id="screen-bitacora" class="screen active">
+  <div class="topbar">
+    <div><div class="topbar-title">Mi bitácora</div><div class="topbar-sub" id="tl-count">0 entradas</div></div>
+    <div class="sync-bar" id="sync-bar"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">sincronizado</span></div>
+    <button class="btn-s" onclick="toggleFilters()"><i class="ti ti-filter"></i> Filtros</button>
+    <button class="btn-p" onclick="nav('agregar');prepareForm('suceso')"><i class="ti ti-plus"></i> Nueva entrada</button>
+  </div>
+  <div style="padding:8px 13px 0;flex-shrink:0">
+    <div class="filter-panel" id="filter-panel">
+      <div class="filter-row">
+        <span class="filter-lbl">Territorio</span>
+        <div id="terr-filter-chips" style="display:flex;gap:5px;flex-wrap:wrap;flex:1"></div>
+        <button class="btn-s" style="font-size:10px;padding:2px 8px" onclick="clearTerrFilter()">Limpiar</button>
+      </div>
+      <div class="filter-row">
+        <span class="filter-lbl">Tipo</span>
+        <select class="sel" id="tl-ftype" onchange="renderTimeline()"><option value="">Todos</option><option value="suceso">Sucesos</option><option value="periodo">Períodos</option><option value="personaje">Personajes</option><option value="civilizacion">Civilizaciones</option><option value="concepto">Conceptos</option><option value="pais">Países</option><option value="fuente">Fuentes</option></select>
+        <select class="sel" id="tl-fcat" onchange="renderTimeline()"><option value="">Todas las categorías</option></select>
+        <label style="display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer;color:var(--text2)">
+          <input type="checkbox" id="tl-fbm" onchange="renderTimeline()" style="width:auto"> Solo marcados
+        </label>
+      </div>
+    </div>
+    <div id="htl-outer">
+      <div id="htl-canvas"></div>
+      <div class="htl-controls">
+        <div class="htl-zoom-row">
+          <button onclick="zoomHTL(-1)" title="Alejar"><i class="ti ti-minus" style="font-size:11px"></i></button>
+          <span id="htl-zoom-lbl" style="min-width:80px;text-align:center;font-size:11px;color:var(--text2)">vista de 100 años</span>
+          <button onclick="zoomHTL(1)" title="Acercar"><i class="ti ti-plus" style="font-size:11px"></i></button>
+        </div>
+        <div class="htl-preset-btns">
+          <span class="htl-preset" onclick="setZoomPreset(5000)">5 mil años</span>
+          <span class="htl-preset" onclick="setZoomPreset(1000)">1000 años</span>
+          <span class="htl-preset" onclick="setZoomPreset(200)">200 años</span>
+          <span class="htl-preset" onclick="setZoomPreset(50)">50 años</span>
+          <span class="htl-preset" onclick="setZoomPreset(10)">10 años</span>
+          <span class="htl-preset" onclick="setZoomPreset(1)">1 año</span>
+        </div>
+      </div>
+      <div class="htl-controls" style="border-top:1px solid var(--border)">
+        <div class="layer-row" id="layer-row">
+          <span class="layer-btn on" data-layer="suceso" onclick="toggleLayer(this)" style="color:#5aabdf;border-color:#5aabdf"><i class="ti ti-point"></i> Sucesos</span>
+          <span class="layer-btn on" data-layer="periodo" onclick="toggleLayer(this)" style="color:#60c060;border-color:#60c060"><i class="ti ti-minus"></i> Períodos</span>
+          <span class="layer-btn on" data-layer="personaje" onclick="toggleLayer(this)" style="color:#e0a040;border-color:#e0a040"><i class="ti ti-user"></i> Personajes</span>
+          <span class="layer-btn on" data-layer="civilizacion" onclick="toggleLayer(this)" style="color:#e06080;border-color:#e06080"><i class="ti ti-building-castle"></i> Civilizaciones</span>
+          <span class="layer-btn on" data-layer="concepto" onclick="toggleLayer(this)" style="color:#40c0b0;border-color:#40c0b0"><i class="ti ti-bulb"></i> Conceptos</span>
+          <span class="layer-btn on" data-layer="pais" onclick="toggleLayer(this)" style="color:#a080e0;border-color:#a080e0"><i class="ti ti-flag"></i> Países</span>
+          <span class="layer-btn on" data-layer="fuente" onclick="toggleLayer(this)" style="color:#a0a0c0;border-color:#a0a0c0"><i class="ti ti-book"></i> Fuentes</span>
+        </div>
+      </div>
+      <div class="time-nav">
+        <span class="time-nav-lbl">Ir a</span>
+        <div class="tnav-inp">
+          <input type="text" id="nav-year-inp" placeholder="Año, siglo, era...">
+          <button onclick="goToTime()">Ir</button>
+        </div>
+        <span class="era-btn" onclick="goToEra(-3000,-500,'Antigüedad')">Antigüedad</span>
+        <span class="era-btn" onclick="goToEra(500,1400,'Edad Media')">Edad Media</span>
+        <span class="era-btn" onclick="goToEra(1400,1600,'Renacimiento')">Renacimiento</span>
+        <span class="era-btn" onclick="goToEra(1600,1800,'Era Moderna')">Era Moderna</span>
+        <span class="era-btn" onclick="goToEra(1800,1950,'S.XIX-XX')">S.XIX-XX</span>
+        <span class="era-btn" onclick="goToEra(1950,2030,'Contemporáneo')">Contemporáneo</span>
+      </div>
+    </div>
+  </div>
+  <div class="sbody" style="padding-top:8px">
+    <div class="tl-empty" id="tl-empty">
+      <i class="ti ti-timeline-event-exclamation"></i>
+      <p>Tu línea de tiempo está vacía.<br>Agregá tu primera entrada.</p>
+      <button class="btn-p" style="margin-top:8px" onclick="nav('agregar');prepareForm('suceso')"><i class="ti ti-plus"></i> Nueva entrada</button>
+    </div>
+    <div class="tl-wrap" id="tl-wrap" style="display:none">
+      <div class="tl-spine"></div>
+      <div id="tl-entries"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PENDIENTES -->
+<div id="screen-pendientes" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">Temas pendientes</div><div class="topbar-sub" id="pend-topcount">0 ideas</div></div>
+  </div>
+  <div class="sbody">
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+      <input type="text" id="pend-search" placeholder="Buscar..." oninput="renderPending()" style="flex:1;min-width:100px;font-size:12px">
+      <select id="pend-sort" onchange="renderPending()" style="font-size:12px"><option value="created">Más recientes</option><option value="epoca">Por época</option><option value="escala">Por escala</option><option value="disparador">Por disparador</option><option value="nombre">Alfabético</option></select>
+      <select id="pend-fdisp" onchange="renderPending()" style="font-size:12px"><option value="">Todos los disparadores</option><option>conversación</option><option>película</option><option>libro</option><option>podcast</option><option>radio</option><option>noticiero</option><option>video</option></select>
+      <select id="pend-fesc" onchange="renderPending()" style="font-size:12px"><option value="">Todas las escalas</option><option>civilización</option><option>proceso histórico</option><option>evento puntual</option><option>personaje</option></select>
+    </div>
+    <div style="overflow-x:auto;border:1px solid var(--border);border-radius:9px">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:500px">
+        <thead><tr style="background:var(--bg2)">
+          <th onclick="sortPend('nombre')" style="text-align:left;padding:7px 9px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);cursor:pointer">Tema</th>
+          <th onclick="sortPend('disparador')" style="text-align:left;padding:7px 9px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);cursor:pointer">Disparador</th>
+          <th onclick="sortPend('epoca')" style="text-align:left;padding:7px 9px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);cursor:pointer">Época</th>
+          <th onclick="sortPend('escala')" style="text-align:left;padding:7px 9px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);cursor:pointer">Escala</th>
+          <th style="text-align:left;padding:7px 9px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border)">Ref.</th>
+          <th style="width:90px;padding:7px 9px;border-bottom:1px solid var(--border)"></th>
+        </tr></thead>
+        <tbody id="pend-tbody"></tbody>
+      </table>
+      <div id="pend-empty" style="text-align:center;padding:32px;color:var(--text3);font-size:13px;display:none"><i class="ti ti-list-check" style="font-size:32px;display:block;margin-bottom:8px"></i>No hay ideas pendientes</div>
+    </div>
+  </div>
+</div>
+
+<!-- YO EN LA HISTORIA -->
+<div id="screen-yo" class="screen">
+  <div class="topbar"><div class="topbar-title">Yo en la historia</div><button class="btn-p" onclick="editMe()"><i class="ti ti-edit"></i> Editar mi perfil</button></div>
+  <div class="sbody">
+    <div class="me-card" id="me-card">
+      <div class="me-card-hd">
+        <div class="me-avatar-big" id="me-avatar-big"><i class="ti ti-user"></i></div>
+        <div><div style="font-size:15px;font-weight:600" id="me-name-display">Tu nombre</div><div style="font-size:12px;color:var(--text3);margin-top:2px" id="me-meta-display">Completá tu perfil</div></div>
+      </div>
+      <div id="me-body-display"></div>
+    </div>
+    <div style="font-size:12px;font-weight:600;margin-bottom:8px">Contexto histórico de tu vida</div>
+    <div id="me-context" style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px;background:var(--bg2);border-radius:9px;border:1px solid var(--border)">Completá tu fecha de nacimiento para ver qué eventos históricos ocurrieron durante tu vida.</div>
+    <button class="ai-btn" style="width:auto;display:inline-flex;margin-top:10px" onclick="aiMeContext()"><i class="ti ti-sparkles"></i> Generar contexto con IA</button>
+    <div style="font-size:12px;font-weight:600;margin:14px 0 8px">Mis hitos personales</div>
+    <div id="me-hitos"></div>
+    <button class="btn-s" style="margin-top:8px" onclick="addHito()"><i class="ti ti-plus"></i> Agregar hito personal</button>
+  </div>
+</div>
+
+<!-- MODO ESTUDIO -->
+<div id="screen-estudio" class="screen">
+  <div class="topbar"><div class="topbar-title">Modo estudio</div><div class="topbar-sub" id="study-progress"></div><button class="btn-s" onclick="nextCard()"><i class="ti ti-arrow-right"></i> Siguiente</button></div>
+  <div class="sbody" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+    <div style="width:100%;max-width:500px">
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <div class="flashcard-q" id="fc-q">Cargando tarjeta…</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px">Tocá para ver la respuesta</div>
+        <div class="flashcard-a" id="fc-a"></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button class="btn-s" onclick="prevCard()"><i class="ti ti-arrow-left"></i> Anterior</button>
+        <button class="btn-s" onclick="flipCard()"><i class="ti ti-rotate"></i> Voltear</button>
+        <button class="btn-s" onclick="nextCard()">Siguiente <i class="ti ti-arrow-right"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ESTADÍSTICAS -->
+<div id="screen-stats" class="screen">
+  <div class="topbar"><div class="topbar-title">Mi aprendizaje</div></div>
+  <div class="sbody">
+    <div class="stat-grid" id="stat-grid"></div>
+    <div style="font-size:12px;font-weight:600;margin-bottom:8px">Por tipo</div>
+    <div id="stat-types" style="margin-bottom:14px"></div>
+    <div style="font-size:12px;font-weight:600;margin-bottom:8px">Territorios más estudiados</div>
+    <div id="stat-regions" style="margin-bottom:14px"></div>
+    <div style="font-size:12px;font-weight:600;margin-bottom:8px">Categorías</div>
+    <div id="stat-cats"></div>
+  </div>
+</div>
+
+<!-- AGREGAR / EDITAR -->
+<div id="screen-agregar" class="screen">
+  <div class="topbar">
+    <div class="topbar-title" id="agregar-title">Nueva entrada</div>
+    <div id="type-pills" class="chip-wrap" style="flex-wrap:nowrap;overflow-x:auto;gap:4px"></div>
+  </div>
+  <div class="sbody">
+    <div class="voice-zone">
+      <div class="vbtn" id="voice-btn" onclick="toggleRecording()"><i class="ti ti-microphone"></i></div>
+      <div class="vstatus" id="voice-status">Dictá o escribí el nombre — la IA completa los campos</div>
+      <div class="vtranscript" id="voice-transcript" style="display:none"></div>
+    </div>
+    <div id="ai-fill-zone"></div>
+    <div id="dynamic-form"></div>
+  </div>
+  <div class="form-actions">
+    <button class="btn-cancel" onclick="cancelForm()"><i class="ti ti-x"></i> Cancelar</button>
+    <button class="btn-p" onclick="saveEntry()"><i class="ti ti-device-floppy"></i> <span id="save-lbl">Guardar</span></button>
+  </div>
+  <input type="hidden" id="edit-id">
+  <input type="hidden" id="current-type" value="suceso">
+</div>
+
+<!-- CONFIG -->
+<div id="screen-config" class="screen">
+  <div class="topbar"><div class="topbar-title">Configuración</div></div>
+  <div class="sbody">
+    <div class="cfg-card">
+      <div class="cfg-title"><i class="ti ti-user-circle"></i> Mi cuenta</div>
+      <div id="cfg-user-info" style="font-size:12px;color:var(--text2);margin-bottom:8px"></div>
+      <button class="btn-s" onclick="signOut()" style="font-size:12px"><i class="ti ti-logout"></i> Cerrar sesión</button>
+    </div>
+    <div class="cfg-card">
+      <div class="cfg-title"><i class="ti ti-microphone"></i> Voz del asistente</div>
+      <div class="cfg-desc">ElevenLabs genera voces naturales en español. Sin API key se usa la voz del navegador (gratuita).</div>
+      <div class="toggle-row" style="margin-bottom:8px"><span style="font-size:13px">Usar ElevenLabs</span><label class="toggle"><input type="checkbox" id="toggle-el" onchange="toggleEL()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+      <div id="el-key-wrap" style="display:none"><input type="password" id="el-key" placeholder="API key de ElevenLabs..." style="margin-bottom:7px"><button class="btn-s" onclick="saveELKey()" style="font-size:12px">Guardar key</button></div>
+    </div>
+    <div class="cfg-card">
+      <div class="cfg-title"><i class="ti ti-brain"></i> Clasificación automática</div>
+      <div class="cfg-desc">Al escribir el nombre o grabar voz, la IA completa los campos automáticamente.</div>
+      <div class="toggle-row"><span style="font-size:13px">Autocompletar con IA</span><label class="toggle"><input type="checkbox" id="toggle-ai-class" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+    </div>
+    <div class="cfg-card">
+      <div class="cfg-title"><i class="ti ti-database"></i> Datos</div>
+      <div class="cfg-desc">Tus datos se sincronizan automáticamente con Firebase. Podés exportar un backup JSON adicional.</div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn-s" onclick="exportData()"><i class="ti ti-download"></i> Exportar JSON</button><button class="btn-s" onclick="importData()"><i class="ti ti-upload"></i> Importar JSON</button><button class="btn-d" onclick="clearData()"><i class="ti ti-trash"></i> Borrar todo</button></div>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
+      <div style="font-size:11px;color:var(--text3);margin-top:8px" id="data-stats"></div>
+    </div>
+    <div class="cfg-card" style="opacity:.45;pointer-events:none">
+      <div class="cfg-title"><i class="ti ti-users"></i> Colaborar</div>
+      <div class="cfg-desc">Compartí tu bitácora. En desarrollo.</div>
+      <div style="font-size:11px;color:var(--text3);padding:5px 9px;background:var(--bg2);border-radius:7px;display:inline-block">🔒 Próximamente</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- DETAIL PANEL -->
+<div class="detail-overlay" id="detail-overlay" onclick="closeDetail()"></div>
+<div class="detail-panel" id="detail-panel">
+  <div class="dp-hd">
+    <button class="btn-icon" onclick="closeDetail()"><i class="ti ti-x"></i></button>
+    <div style="flex:1;font-size:13px;font-weight:600;line-height:1.3" id="dp-title">—</div>
+    <button class="btn-icon" id="dp-bm-btn" onclick="toggleBookmark()"><i class="ti ti-bookmark"></i></button>
+    <button class="btn-icon" onclick="editEntry()"><i class="ti ti-edit"></i></button>
+    <button class="btn-icon" onclick="deleteEntry()" style="color:var(--danger)"><i class="ti ti-trash"></i></button>
+  </div>
+  <div class="dp-body">
+    <div class="dsec" id="dp-meta"></div>
+    <div class="dsec" id="dp-notes-wrap" style="display:none"><div class="dsec-title">Mis notas</div><div class="detail-note" id="dp-notes"></div></div>
+    <div class="dsec" id="dp-media-wrap" style="display:none"><div class="dsec-title">Referencias</div><div id="dp-media"></div></div>
+    <div class="dsec" id="dp-conn-wrap"><div class="dsec-title">Conexiones</div><div id="dp-conns"></div><button class="btn-s" style="font-size:11px;margin-top:5px" onclick="openConnModal()"><i class="ti ti-link"></i> Agregar conexión</button></div>
+    <div class="dsec">
+      <div class="dsec-title">Asistente</div>
+      <button class="ai-btn" id="btn-sum-evt" onclick="aiSummaryEvent()"><i class="ti ti-sparkles"></i> Resumir este elemento</button>
+      <button class="ai-btn" id="btn-sum-learn" onclick="aiSummaryLearned()"><i class="ti ti-brain"></i> Resumir lo que aprendí</button>
+      <button class="ai-btn" id="btn-speak" onclick="aiSpeak()"><i class="ti ti-volume"></i> Escuchar en voz</button>
+      <button class="ai-btn" id="btn-suggest" onclick="aiSuggest()"><i class="ti ti-bulb"></i> Sugerirme contenido</button>
+      <button class="ai-btn" id="btn-sources" onclick="aiSources()"><i class="ti ti-world"></i> Buscar fuentes y enciclopedias</button>
+      <button class="ai-btn" id="btn-narrative" onclick="aiNarrative()"><i class="ti ti-writing"></i> Generar narrativa</button>
+      <div class="ai-out" id="ai-out"></div>
+      <div id="suggest-list" style="display:none;margin-top:6px"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<!-- FAB -->
+<div class="fab" id="fab" style="display:none">
+  <span class="fab-lbl">Idea rápida</span>
+  <button class="fab-btn" onclick="openQuickModal()"><i class="ti ti-microphone"></i></button>
+</div>
+
+<!-- QUICK IDEA MODAL -->
+<div class="modal-bg" id="qi-bg">
+  <div class="modal">
+    <div class="modal-hd">Idea rápida <button class="btn-icon" onclick="closeQuickModal()"><i class="ti ti-x" style="font-size:18px"></i></button></div>
+    <div class="voice-zone" style="margin-bottom:12px">
+      <div class="vbtn" id="qi-vbtn" onclick="toggleQIRec()"><i class="ti ti-microphone"></i></div>
+      <div class="vstatus" id="qi-status">Tocá para dictar tu idea histórica</div>
+      <div class="vtranscript" id="qi-transcript" style="display:none"></div>
+    </div>
+    <div class="fg"><label class="flabel">Tema</label><input type="text" id="qi-title" placeholder="Ej: Imperio Mongol..."></div>
+    <div class="fgrid fg">
+      <div><label class="flabel">Época aproximada</label><input type="text" id="qi-epoca" placeholder="Ej: siglo XIII..."></div>
+      <div><label class="flabel">Escala</label><select id="qi-escala"><option value="">Seleccioná...</option><option>civilización</option><option>proceso histórico</option><option>evento puntual</option><option>personaje</option></select></div>
+    </div>
+    <div class="fg"><label class="flabel">¿Cómo llegué a esta idea?</label>
+      <div class="chip-wrap" id="qi-disp">
+        <span class="chip" data-disp="conversación" onclick="toggleQIDisp(this)"><i class="ti ti-message-circle"></i> conversación</span>
+        <span class="chip" data-disp="película" onclick="toggleQIDisp(this)"><i class="ti ti-movie"></i> película</span>
+        <span class="chip" data-disp="libro" onclick="toggleQIDisp(this)"><i class="ti ti-book"></i> libro</span>
+        <span class="chip" data-disp="podcast" onclick="toggleQIDisp(this)"><i class="ti ti-headphones"></i> podcast</span>
+        <span class="chip" data-disp="radio" onclick="toggleQIDisp(this)"><i class="ti ti-radio"></i> radio</span>
+        <span class="chip" data-disp="noticiero" onclick="toggleQIDisp(this)"><i class="ti ti-news"></i> noticiero</span>
+        <span class="chip" data-disp="video" onclick="toggleQIDisp(this)"><i class="ti ti-brand-youtube"></i> video</span>
+      </div>
+    </div>
+    <div class="fg"><label class="flabel">Referencia que originó la idea</label><input type="text" id="qi-ref" placeholder="Link, título, nombre..."></div>
+    <div class="fg"><label class="flabel">Conexión con lo que ya estudié</label><input type="text" id="qi-relacion" placeholder="Ej: relacionado con la Rev. Francesa..."></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-cancel" style="flex:1;justify-content:center;padding:9px" onclick="closeQuickModal()"><i class="ti ti-x"></i> Cancelar</button>
+      <button class="btn-p" style="flex:2;justify-content:center;padding:9px" id="qi-save-btn" onclick="saveQuickIdea()"><i class="ti ti-device-floppy"></i> Guardar idea</button>
+    </div>
+  </div>
+</div>
+
+<!-- ME EDIT MODAL -->
+<div class="modal-bg center" id="me-modal-bg">
+  <div class="modal center-modal">
+    <div class="modal-hd">Mi perfil histórico <button class="btn-icon" onclick="document.getElementById('me-modal-bg').classList.remove('open')"><i class="ti ti-x" style="font-size:18px"></i></button></div>
+    <div class="fg"><label class="flabel">Mi nombre</label><input type="text" id="me-name-inp" placeholder="Tu nombre completo..."></div>
+    <div class="fgrid fg">
+      <div>
+        <label class="flabel">Fecha de nacimiento</label>
+        <div style="display:grid;grid-template-columns:60px 1fr 100px;gap:5px">
+          <input type="number" id="me-day" placeholder="Día" min="1" max="31">
+          <div id="me-month-wrap"></div>
+          <input type="number" id="me-year" placeholder="Año">
+        </div>
+      </div>
+      <div>
+        <label class="flabel">Lugar de nacimiento</label>
+        <div class="terr-wrap" id="me-place-wrap">
+          <input type="text" id="me-place" placeholder="Ciudad, País...">
+          <div class="terr-drop" id="me-place-drop"></div>
+        </div>
+      </div>
+    </div>
+    <div class="fg"><label class="flabel">Sobre mí (opcional)</label><textarea id="me-about" placeholder="Lo que querés que aparezca en tu entrada personal..." style="height:80px"></textarea></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-cancel" style="flex:1;justify-content:center" onclick="document.getElementById('me-modal-bg').classList.remove('open')"><i class="ti ti-x"></i> Cancelar</button>
+      <button class="btn-p" style="flex:1;justify-content:center" onclick="saveMe()"><i class="ti ti-device-floppy"></i> Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- HITO MODAL -->
+<div class="modal-bg center" id="hito-modal-bg">
+  <div class="modal center-modal">
+    <div class="modal-hd">Hito personal <button class="btn-icon" onclick="document.getElementById('hito-modal-bg').classList.remove('open')"><i class="ti ti-x" style="font-size:18px"></i></button></div>
+    <div class="fg"><label class="flabel">Descripción</label><input type="text" id="hito-title" placeholder="Ej: Me recibí, viajé a Europa..."></div>
+    <div class="fg">
+      <label class="flabel">Fecha</label>
+      <div style="display:grid;grid-template-columns:60px 1fr 100px;gap:5px">
+        <input type="number" id="hito-day" placeholder="Día" min="1" max="31">
+        <div id="hito-month-wrap"></div>
+        <input type="number" id="hito-year" placeholder="Año">
+      </div>
+    </div>
+    <div class="fg"><label class="flabel">Lugar (opcional)</label><input type="text" id="hito-place" placeholder="Ciudad, país..."></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-cancel" style="flex:1;justify-content:center" onclick="document.getElementById('hito-modal-bg').classList.remove('open')"><i class="ti ti-x"></i> Cancelar</button>
+      <button class="btn-p" style="flex:1;justify-content:center" onclick="saveHito()"><i class="ti ti-device-floppy"></i> Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONNECTION MODAL -->
+<div class="modal-bg center" id="conn-modal-bg">
+  <div class="modal center-modal">
+    <div class="modal-hd">Agregar conexión <button class="btn-icon" onclick="document.getElementById('conn-modal-bg').classList.remove('open')"><i class="ti ti-x" style="font-size:18px"></i></button></div>
+    <div class="fg"><label class="flabel">Conectar con</label><select id="conn-select" style="width:100%"></select></div>
+    <div class="fg"><label class="flabel">Tipo de conexión</label><select id="conn-type"><option value="causa">Causa / consecuencia</option><option value="paralelo">Sucede en paralelo</option><option value="personaje">Personaje involucrado</option><option value="territorio">Mismo territorio</option><option value="tematico">Temáticamente relacionado</option></select></div>
+    <div class="fg"><label class="flabel">Nota</label><input type="text" id="conn-note" placeholder="Descripción de la conexión..."></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-cancel" style="flex:1;justify-content:center" onclick="document.getElementById('conn-modal-bg').classList.remove('open')"><i class="ti ti-x"></i> Cancelar</button>
+      <button class="btn-p" style="flex:1;justify-content:center" onclick="saveConnection()">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAP MODAL -->
+<div class="modal-bg center" id="map-modal-bg">
+  <div class="modal center-modal">
+    <div class="modal-hd">Ubicación geográfica <button class="btn-icon" onclick="document.getElementById('map-modal-bg').classList.remove('open')"><i class="ti ti-x" style="font-size:18px"></i></button></div>
+    <div style="width:100%;height:280px;border-radius:9px;overflow:hidden;border:1px solid var(--border)"><iframe id="map-iframe" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe></div>
+    <div style="font-size:11px;color:var(--text3);margin-top:7px" id="map-desc"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js';
+import{getAuth,GoogleAuthProvider,signInWithPopup,signOut as fbSignOut,onAuthStateChanged}from'https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js';
+import{getFirestore,doc,getDoc,setDoc,onSnapshot,collection,query,where}from'https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js';
+
+const firebaseConfig={
+  apiKey:"AIzaSyCB31ZbOocRIVZ4wnb3krLo8c9AXhUhFD4",
+  authDomain:"bitacora-historica.firebaseapp.com",
+  projectId:"bitacora-historica",
+  storageBucket:"bitacora-historica.firebasestorage.app",
+  messagingSenderId:"1007820676056",
+  appId:"1:1007820676056:web:dfcbbbdea456b39e65930ad"
+};
+
+const firebaseApp=initializeApp(firebaseConfig);
+const auth=getAuth(firebaseApp);
+const db=getFirestore(firebaseApp);
+const provider=new GoogleAuthProvider();
+
+let currentUser=null;
+let unsubscribeDB=null;
+
+window.signInWithGoogle=async()=>{
+  try{await signInWithPopup(auth,provider);}
+  catch(e){showToast('Error al iniciar sesión: '+e.message);}
+};
+
+window.signOut=async()=>{
+  if(!confirm('¿Cerrar sesión?'))return;
+  if(unsubscribeDB)unsubscribeDB();
+  await fbSignOut(auth);
+  currentUser=null;
+  document.getElementById('app').style.display='none';
+  document.getElementById('fab').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  showToast('Sesión cerrada');
+};
+
+onAuthStateChanged(auth,async user=>{
+  if(user){
+    currentUser=user;
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    document.getElementById('fab').style.display='flex';
+    // Update user avatar
+    const avatar=document.getElementById('user-avatar');
+    if(user.photoURL){
+      avatar.outerHTML=`<img src="${user.photoURL}" class="user-avatar" onclick="showUserMenu()" title="${user.displayName||user.email}" id="user-avatar" style="margin-top:auto;margin-bottom:4px">`;
+    }
+    document.getElementById('cfg-user-info').innerHTML=`<strong>${user.displayName||'Usuario'}</strong><br>${user.email}`;
+    // Subscribe to Firestore
+    const docRef=doc(db,'users',user.uid);
+    setSyncStatus('syncing');
+    unsubscribeDB=onSnapshot(docRef,snap=>{
+      if(snap.exists()){
+        const data=snap.data();
+        DB.events=data.events||[];
+        DB.pending=data.pending||[];
+        DB.categories=data.categories||['política','guerra','cultura','ciencia','religión','economía','sociedad'];
+        DB.connections=data.connections||[];
+        DB.me=data.me||null;
+        renderTimeline();renderPending();updatePendDot();updateStats();
+        if(document.getElementById('screen-yo').classList.contains('active'))renderMe();
+        setSyncStatus('ok');
+      } else {
+        // First time user
+        const initial={events:[],pending:[],categories:['política','guerra','cultura','ciencia','religión','economía','sociedad'],connections:[],me:null};
+        setDoc(docRef,initial);
+        setSyncStatus('ok');
+      }
+    },err=>{setSyncStatus('offline');console.error(err);});
+    showToast('Bienvenido, '+(user.displayName||user.email).split(' ')[0]);
+  } else {
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('app').style.display='none';
+    document.getElementById('fab').style.display='none';
+  }
+});
+
+window.saveDB=async()=>{
+  if(!currentUser)return;
+  setSyncStatus('syncing');
+  try{
+    await setDoc(doc(db,'users',currentUser.uid),{
+      events:DB.events,pending:DB.pending,
+      categories:DB.categories,connections:DB.connections,
+      me:DB.me||null
+    });
+    setSyncStatus('ok');
+  }catch(e){setSyncStatus('offline');showToast('Error al guardar');}
+  updatePendDot();updateStats();
+};
+
+function setSyncStatus(s){
+  const dot=document.getElementById('sync-dot');
+  const lbl=document.getElementById('sync-label');
+  if(!dot||!lbl)return;
+  dot.className='sync-dot'+(s==='syncing'?' syncing':s==='offline'?' offline':'');
+  lbl.textContent=s==='syncing'?'sincronizando...':s==='offline'?'sin conexión':'sincronizado';
+}
+
+window.showUserMenu=()=>{
+  const u=currentUser;if(!u)return;
+  if(confirm(`${u.displayName||u.email}\n\n¿Cerrar sesión?`))window.signOut();
+};
+</script>
+
+<script>
+// ===== CONSTANTS =====
+const MES=['','enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const MES_SHORT=['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const DISP_ICONS={conversación:'ti-message-circle',película:'ti-movie',libro:'ti-book',podcast:'ti-headphones',radio:'ti-radio',noticiero:'ti-news',video:'ti-brand-youtube'};
+const TYPE_COL={suceso:'#5aabdf',periodo:'#60c060',personaje:'#e0a040',civilizacion:'#e06080',concepto:'#40c0b0',pais:'#a080e0',fuente:'#a0a0c0'};
+const TYPE_BG_L={suceso:'#daeef8',periodo:'#d8f0d8',personaje:'#faecd0',civilizacion:'#fadce4',concepto:'#d0f0ec',pais:'#e8e0f8',fuente:'#e8e8ec'};
+const TYPE_BG_D={suceso:'#0a2030',periodo:'#0a200a',personaje:'#281c00',civilizacion:'#280818',concepto:'#082820',pais:'#1c1030',fuente:'#181820'};
+const TYPE_LBL={suceso:'Suceso',periodo:'Período',personaje:'Personaje',civilizacion:'Civilización',concepto:'Concepto',pais:'País',fuente:'Fuente'};
+const TYPE_ICON={suceso:'ti-point',periodo:'ti-minus',personaje:'ti-user',civilizacion:'ti-building-castle',concepto:'ti-bulb',pais:'ti-flag',fuente:'ti-book'};
+const MEDIA_ICONS={youtube:'ti-brand-youtube',pelicula:'ti-movie',serie:'ti-device-tv',documental:'ti-video',libro:'ti-book','artículo académico':'ti-file-text',revista:'ti-news',podcast:'ti-headphones','canal youtube':'ti-brand-youtube',blog:'ti-pencil','sitio web':'ti-world',hemeroteca:'ti-archive',museo:'ti-building',conferencia:'ti-microphone','mapa histórico':'ti-map',imagen:'ti-photo',documento:'ti-file',enlace:'ti-link'};
+const SOURCE_TYPES=['libro','artículo académico','revista','película','serie','documental','podcast','canal YouTube','video','blog','sitio web','hemeroteca / archivo','red social','entrevista','conferencia / charla','museo / exposición','mapa histórico','otro'];
+const TERRITORIES=[
+  {n:'África',t:'continente'},{n:'Asia',t:'continente'},{n:'Europa',t:'continente'},{n:'Américas',t:'continente'},{n:'Medio Oriente',t:'región'},{n:'Oceanía',t:'continente'},
+  {n:'Alemania',t:'país'},{n:'Arabia Saudita',t:'país'},{n:'Argentina',t:'país'},{n:'Australia',t:'país'},{n:'Austria',t:'país'},{n:'Bolivia',t:'país'},{n:'Brasil',t:'país'},{n:'Canadá',t:'país'},{n:'Chile',t:'país'},{n:'China',t:'país'},{n:'Colombia',t:'país'},{n:'Cuba',t:'país'},{n:'Ecuador',t:'país'},{n:'Egipto',t:'país'},{n:'España',t:'país'},{n:'Estados Unidos',t:'país'},{n:'Francia',t:'país'},{n:'Grecia',t:'país'},{n:'Hungría',t:'país'},{n:'India',t:'país'},{n:'Inglaterra',t:'país'},{n:'Iraq',t:'país'},{n:'Israel',t:'país'},{n:'Italia',t:'país'},{n:'Japón',t:'país'},{n:'Jordania',t:'país'},{n:'México',t:'país'},{n:'Mongolia',t:'país'},{n:'Paraguay',t:'país'},{n:'Perú',t:'país'},{n:'Polonia',t:'país'},{n:'Portugal',t:'país'},{n:'Rusia',t:'país'},{n:'Siria',t:'país'},{n:'Sudáfrica',t:'país'},{n:'Turquía',t:'país'},{n:'Ucrania',t:'país'},{n:'Uruguay',t:'país'},{n:'Venezuela',t:'país'},
+  {n:'Buenos Aires',t:'ciudad'},{n:'Ciudad de México',t:'ciudad'},{n:'Roma',t:'ciudad'},{n:'París',t:'ciudad'},{n:'Londres',t:'ciudad'},{n:'Berlín',t:'ciudad'},{n:'Moscú',t:'ciudad'},{n:'Pekín',t:'ciudad'},{n:'Tokio',t:'ciudad'},{n:'El Cairo',t:'ciudad'},{n:'Atenas',t:'ciudad'},{n:'Constantinopla',t:'ciudad'},{n:'Versalles',t:'ciudad'},{n:'Asunción',t:'ciudad'},{n:'Lima',t:'ciudad'},{n:'Bogotá',t:'ciudad'},{n:'Santiago',t:'ciudad'},{n:'Córdoba',t:'ciudad'},{n:'Rosario',t:'ciudad'},{n:'Montevideo',t:'ciudad'},
+  {n:'Imperio Romano',t:'imperio'},{n:'Imperio Otomano',t:'imperio'},{n:'Imperio Mongol',t:'imperio'},{n:'Imperio Británico',t:'imperio'},{n:'Imperio Bizantino',t:'imperio'},
+];
+
+// ===== STATE =====
+let DB={events:[],pending:[],categories:['política','guerra','cultura','ciencia','religión','economía','sociedad'],connections:[],me:null};
+let currentDetailId=null;let currentEditId=null;let prevScreen='bitacora';
+let pendSortCol='created';let pendSortAsc=false;
+let recognition=null;let isRecording=false;let qiRec=null;let qiRecording=false;
+let htlZoom=1;let htlOffset=0;let htlDragging=false;let htlDragStart=0;let htlOffsetStart=0;
+let activeLayers=new Set(['suceso','periodo','personaje','civilizacion','concepto','pais','fuente']);
+let activeTerrFilters=new Set();
+let entryRegions=[];let entryMediaGroups={};
+let studyCards=[];let studyIndex=0;let studyFlipped=false;
+let monthPickerInstances={};
+let htlSpan=500; // visible span in years
+
+// Fallback saveDB for before Firebase loads
+if(!window.saveDB)window.saveDB=()=>{try{localStorage.setItem('bitacora_v6_local',JSON.stringify(DB));}catch(e){}};
+
+function loadLocalFallback(){try{const s=localStorage.getItem('bitacora_v6_local');if(s){const d=JSON.parse(s);DB={...DB,...d};}}catch(e){}}
+loadLocalFallback();
+
+let toastTimer=null;
+function showToast(msg){
+  clearTimeout(toastTimer);
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+function updatePendDot(){const d=document.getElementById('pend-dot');if(d)d.classList.toggle('show',DB.pending.length>0);}
+function updateStats(){const el=document.getElementById('data-stats');if(el)el.textContent=`${DB.events.length} entrada${DB.events.length!==1?'s':''} · ${DB.pending.length} pendiente${DB.pending.length!==1?'s':''}`;}
+function isDark(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;}
+function typeBG(t){return isDark()?(TYPE_BG_D[t]||'#181820'):(TYPE_BG_L[t]||'var(--bg2)');}
+function typeBD(t){return isDark()?(TYPE_COL[t]+'55'||'var(--border)'):(TYPE_COL[t]+'44'||'var(--border)');}
+
+// ===== NAV =====
+function nav(name){
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  const nb=document.getElementById('nav-'+name);if(nb)nb.classList.add('active');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const sc=document.getElementById('screen-'+name);if(sc)sc.classList.add('active');
+  closeDetail();
+  if(name==='bitacora'){renderTimeline();renderHTL();}
+  if(name==='pendientes')renderPending();
+  if(name==='stats')renderStats();
+  if(name==='estudio')initStudy();
+  if(name==='yo')renderMe();
+  if(name==='config')updateStats();
+  if(name!=='agregar')prevScreen=name;
+}
+function cancelForm(){currentEditId=null;clearForm();nav(prevScreen||'bitacora');showToast('Cambios descartados');}
+
+// ===== MONTH PICKER =====
+function createMonthPicker(id){
+  const wrap=document.createElement('div');wrap.className='month-wrap';
+  const inp=document.createElement('input');inp.type='text';inp.id=id;inp.placeholder='Mes';inp.className='month-inp';inp.autocomplete='off';
+  inp.dataset.val='';
+  const drop=document.createElement('div');drop.className='month-drop';
+  const search=document.createElement('input');search.type='text';search.className='month-search';search.placeholder='Mes o número...';search.autocomplete='off';search.tabIndex=-1;
+  const list=document.createElement('div');list.className='month-list';
+  let hiIdx=0;let debounceTimer=null;
+
+  function getOpts(f){return MES.slice(1).map((m,i)=>({m,i:i+1})).filter(({m,i})=>!f||m.startsWith(f.toLowerCase())||String(i).startsWith(f));}
+  function renderList(f){
+    const opts=getOpts(f);hiIdx=0;
+    list.innerHTML=opts.map(({m,i},idx)=>`<div class="month-opt${parseInt(inp.dataset.val)===i?' selected':''}" data-i="${i}" data-idx="${idx}">${i} — ${m}</div>`).join('');
+    list.querySelectorAll('.month-opt').forEach(o=>{o.onclick=()=>{setMonthVal(parseInt(o.dataset.i));drop.classList.remove('open');inp.focus();};});
+    if(opts.length)list.querySelectorAll('.month-opt')[0]?.classList.add('hi');
+  }
+  function setMonthVal(v){inp.value=MES_SHORT[v]||'';inp.dataset.val=v;}
+  function openDrop(){drop.classList.add('open');renderList('');search.value='';setTimeout(()=>search.focus(),30);}
+  function closeDrop(){drop.classList.remove('open');}
+  function movHi(d){const opts=list.querySelectorAll('.month-opt');if(!opts.length)return;opts[hiIdx]?.classList.remove('hi');hiIdx=(hiIdx+d+opts.length)%opts.length;opts[hiIdx]?.classList.add('hi');opts[hiIdx]?.scrollIntoView({block:'nearest'});}
+  function selectHi(){const opts=list.querySelectorAll('.month-opt');if(opts[hiIdx]){setMonthVal(parseInt(opts[hiIdx].dataset.i));closeDrop();inp.focus();}}
+
+  inp.addEventListener('focus',openDrop);
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Tab'){closeDrop();return;}
+    if(!drop.classList.contains('open'))openDrop();
+    if(e.key==='ArrowDown'){e.preventDefault();movHi(1);}
+    else if(e.key==='ArrowUp'){e.preventDefault();movHi(-1);}
+    else if(e.key==='Enter'){e.preventDefault();selectHi();}
+    else if(e.key.length===1){
+      search.value+=e.key;
+      const n=parseInt(search.value);
+      clearTimeout(debounceTimer);
+      if(!isNaN(n)&&n>=1&&n<=12){
+        debounceTimer=setTimeout(()=>{setMonthVal(n);closeDrop();search.value='';},500);
+      }
+      renderList(search.value);
+      e.preventDefault();
+    }
+  });
+  search.addEventListener('input',()=>{
+    const q=search.value;const n=parseInt(q);
+    if(!isNaN(n)&&n>=1&&n<=12&&q.length>=2){setMonthVal(n);closeDrop();return;}
+    renderList(q);
+  });
+  search.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'){e.preventDefault();movHi(1);}
+    else if(e.key==='ArrowUp'){e.preventDefault();movHi(-1);}
+    else if(e.key==='Enter'){e.preventDefault();selectHi();}
+    else if(e.key==='Escape')closeDrop();
+  });
+  document.addEventListener('click',e=>{if(!wrap.contains(e.target))closeDrop();});
+  drop.appendChild(search);drop.appendChild(list);wrap.appendChild(inp);wrap.appendChild(drop);
+  monthPickerInstances[id]={setVal:(v)=>{if(v)setMonthVal(parseInt(v));},getVal:()=>parseInt(inp.dataset.val)||null};
+  return wrap;
+}
+
+// ===== TERRITORY AUTOCOMPLETE =====
+function createTerrInput(onAdd){
+  const wrap=document.createElement('div');wrap.className='terr-wrap';
+  const row=document.createElement('div');row.style.cssText='display:flex;gap:6px';
+  const inp=document.createElement('input');inp.type='text';inp.placeholder='País, ciudad, región...';inp.style.flex='1';
+  const btn=document.createElement('button');btn.type='button';btn.className='btn-s';btn.style.cssText='padding:6px 11px;white-space:nowrap';btn.innerHTML='+ Agregar';
+  const drop=document.createElement('div');drop.className='terr-drop';
+  function getSugg(q){
+    const used=[...new Set(DB.events.flatMap(e=>e.regions||[]))];
+    const custom=used.filter(t=>!TERRITORIES.find(x=>x.n===t)).map(t=>({n:t,t:'personalizado'}));
+    return[...TERRITORIES,...custom].filter(t=>t.n.toLowerCase().includes(q.toLowerCase())).slice(0,10);
+  }
+  function renderDrop(q){
+    if(!q.trim()){drop.classList.remove('open');return;}
+    const sugg=getSugg(q);
+    if(!sugg.length){drop.classList.remove('open');return;}
+    drop.innerHTML=sugg.map(s=>`<div class="terr-opt"><i class="ti ti-map-pin"></i><span>${s.n}</span><span class="tsub">${s.t}</span></div>`).join('');
+    drop.querySelectorAll('.terr-opt').forEach(o=>{o.onclick=()=>{onAdd(o.querySelector('span').textContent);inp.value='';drop.classList.remove('open');};});
+    drop.classList.add('open');
+  }
+  inp.addEventListener('input',()=>renderDrop(inp.value));
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(inp.value.trim()){inp.value.split(',').forEach(v=>{const vt=v.trim();if(vt)onAdd(vt);});inp.value='';drop.classList.remove('open');}};if(e.key==='Escape')drop.classList.remove('open');});
+  btn.onclick=()=>{if(inp.value.trim()){inp.value.split(',').forEach(v=>{const vt=v.trim();if(vt)onAdd(vt);});inp.value='';drop.classList.remove('open');}};
+  document.addEventListener('click',e=>{if(!wrap.contains(e.target))drop.classList.remove('open');});
+  row.appendChild(inp);row.appendChild(btn);wrap.appendChild(row);wrap.appendChild(drop);
+  return wrap;
+}
+
+// territory autocomplete for single input (me-place)
+function setupTerrSingleInput(inputId,dropId){
+  const inp=document.getElementById(inputId);const drop=document.getElementById(dropId);
+  if(!inp||!drop)return;
+  function getSugg(q){
+    const used=[...new Set(DB.events.flatMap(e=>e.regions||[]))];
+    const custom=used.filter(t=>!TERRITORIES.find(x=>x.n===t)).map(t=>({n:t,t:'personalizado'}));
+    return[...TERRITORIES,...custom].filter(t=>t.n.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  }
+  inp.addEventListener('input',()=>{
+    const q=inp.value;if(!q.trim()){drop.classList.remove('open');return;}
+    const sugg=getSugg(q);
+    if(!sugg.length){drop.classList.remove('open');return;}
+    drop.innerHTML=sugg.map(s=>`<div class="terr-opt"><i class="ti ti-map-pin"></i><span>${s.n}</span><span class="tsub">${s.t}</span></div>`).join('');
+    drop.querySelectorAll('.terr-opt').forEach(o=>{o.onclick=()=>{inp.value=o.querySelector('span').textContent;drop.classList.remove('open');};});
+    drop.classList.add('open');
+  });
+  document.addEventListener('click',e=>{if(!inp.contains(e.target)&&!drop.contains(e.target))drop.classList.remove('open');});
+}
+
+// ===== DATE TEXT PARSER =====
+function parseDateText(txt){
+  if(!txt)return null;txt=txt.trim().toLowerCase();
+  const sigloMap={'i':100,'ii':200,'iii':300,'iv':400,'v':500,'vi':600,'vii':700,'viii':800,'ix':900,'x':1000,'xi':1100,'xii':1200,'xiii':1300,'xiv':1400,'xv':1500,'xvi':1600,'xvii':1700,'xviii':1800,'xix':1900,'xx':2000,'xxi':2100};
+  const eraMap={'antigüedad':-500,'edad media':1000,'renacimiento':1500,'era moderna':1700,'ilustración':1750,'revolución industrial':1800,'siglo xix':1850,'segunda guerra mundial':1940,'guerra fría':1960,'contemporáneo':2000,'prehistoria':-5000};
+  for(const[k,v]of Object.entries(eraMap)){if(txt.includes(k))return{year:v,approx:true};}
+  for(const[k,v]of Object.entries(sigloMap)){
+    const rx=new RegExp(`siglo\\s+${k}\\b`,'i');
+    if(rx.test(txt)){const ac=txt.includes('a.c')||txt.includes('antes');return{year:ac?-(v-100):v-100,approx:true};}
+  }
+  const numMatch=txt.match(/-?\d+/);
+  if(numMatch){const n=parseInt(numMatch[0]);if(!isNaN(n))return{year:n,approx:false};}
+  return null;
+}
+
+// ===== DYNAMIC FORM =====
+const FORM_DEFS={
+  suceso:[{f:'title',label:'Nombre del suceso',ph:'Ej: Caída del Imperio Romano...'},{f:'date-single',label:'Fecha'},{f:'regions'},{f:'cats'},{f:'notes'},{f:'media'}],
+  periodo:[{f:'title',label:'Nombre del período',ph:'Ej: Segunda Guerra Mundial...'},{f:'date-range',labelS:'Inicio',labelE:'Fin (vacío = presente)'},{f:'regions'},{f:'cats'},{f:'notes'},{f:'media'}],
+  personaje:[{f:'title',label:'Nombre del personaje',ph:'Ej: Napoleón Bonaparte...'},{f:'date-range',labelS:'Nacimiento',labelE:'Muerte (vacío = aún vive)'},{f:'text',id:'f-origin',label:'Nacionalidad / origen',ph:'Ej: Francia...'},{f:'text',id:'f-role',label:'Rol / ocupación',ph:'Ej: Militar, Emperador...'},{f:'regions',label:'Territorios donde actuó'},{f:'cats'},{f:'notes'},{f:'media'}],
+  civilizacion:[{f:'title',label:'Nombre de la civilización',ph:'Ej: Imperio Romano...'},{f:'date-range',labelS:'Período de auge — inicio',labelE:'Período de auge — fin'},{f:'regions',label:'Territorios que abarcó'},{f:'text',id:'f-characteristics',label:'Características principales',ph:'Cultura, logros, estructura...'},{f:'cats'},{f:'notes'},{f:'media'}],
+  concepto:[{f:'title',label:'Nombre del concepto',ph:'Ej: Feudalismo, Colonialismo...'},{f:'date-approx',labelS:'Época de origen (aproximada)',labelE:'Época de declive (puede estar vacío)'},{f:'regions',label:'Territorios donde se manifestó'},{f:'text',id:'f-description',label:'Descripción',ph:'Qué es, cómo funciona, por qué importa...'},{f:'cats'},{f:'notes'},{f:'media'}],
+  pais:[{f:'title',label:'Nombre del país',ph:'Ej: República del Paraguay...'},{f:'date-single',label:'Fecha de fundación / independencia'},{f:'text',id:'f-capital',label:'Capital',ph:'Ej: Asunción...'},{f:'text',id:'f-government',label:'Forma de gobierno',ph:'Ej: República presidencial...'},{f:'regions',label:'Ubicación / territorio'},{f:'cats'},{f:'notes',label:'Historia, contexto, hitos'},{f:'media'}],
+  fuente:[{f:'title',label:'Título',ph:'Ej: Gladiator, Sapiens...'},{f:'text',id:'f-author',label:'Autor / Director / Creador',ph:'Ej: Ridley Scott...'},{f:'source-type'},{f:'date-range',labelS:'Fecha de producción / estreno',labelE:'Fecha de fin (series; vacío si continúa)'},{f:'date-approx',labelS:'Período histórico que narra — inicio',labelE:'Período histórico que narra — fin'},{f:'text',id:'f-topic',label:'Tema / época que narra',ph:'Ej: Imperio Romano siglo II...'},{f:'text',id:'f-link',label:'Link',ph:'URL...'},{f:'notes',label:'Mis notas sobre esta fuente'},{f:'media'}],
+};
+
+function buildForm(type){
+  const fb=document.getElementById('dynamic-form');fb.innerHTML='';
+  entryRegions=[];entryMediaGroups={};monthPickerInstances={};
+  (FORM_DEFS[type]||FORM_DEFS.suceso).forEach(def=>fb.appendChild(buildField(def)));
+  renderCategories();buildAIFillBar(type);
+  const titleEl=document.getElementById('f-title');
+  if(titleEl){
+    titleEl.addEventListener('blur',()=>{
+      if(titleEl.value.trim().length>2&&document.getElementById('toggle-ai-class')?.checked&&!currentEditId)autoFillForm(titleEl.value.trim(),type);
+    });
+  }
+}
+
+function buildAIFillBar(type){
+  document.getElementById('ai-fill-zone').innerHTML=`<div class="ai-fill-bar"><i class="ti ti-sparkles"></i><span>Escribí el nombre para autocompletar con IA, o dictá con el micrófono.</span><button class="ai-fill-btn" id="ai-fill-btn" onclick="manualAIFill('${type}')">Autocompletar ahora</button></div>`;
+}
+
+function buildField(def){
+  const div=document.createElement('div');div.className='fg';
+  if(def.f==='title'){
+    mk(div,'label','flabel',def.label||'Nombre');
+    const i=document.createElement('input');i.type='text';i.id='f-title';i.placeholder=def.ph||'';
+    div.appendChild(i);
+  } else if(def.f==='text'){
+    mk(div,'label','flabel',def.label);
+    const i=document.createElement('input');i.type='text';i.id=def.id;i.placeholder=def.ph||'';
+    div.appendChild(i);
+  } else if(def.f==='source-type'){
+    mk(div,'label','flabel','Tipo de fuente');
+    const s=document.createElement('select');s.id='f-source-type';
+    SOURCE_TYPES.forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;s.appendChild(op);});
+    div.appendChild(s);
+  } else if(def.f==='date-single'){
+    mk(div,'label','flabel',def.label||'Fecha');
+    div.appendChild(buildDateRow('f-day','f-month','f-year'));
+    mk(div,'div','date-hint','Podés escribir año exacto o a.C. con número negativo');
+  } else if(def.f==='date-range'){
+    mk(div,'label','flabel',def.labelS||'Inicio');
+    div.appendChild(buildDateRow('f-day','f-month','f-year'));
+    const le=document.createElement('label');le.className='flabel';le.style.marginTop='8px';le.textContent=def.labelE||'Fin';
+    div.appendChild(le);div.appendChild(buildDateRow('f-day-end','f-month-end','f-year-end'));
+  } else if(def.f==='date-approx'){
+    mk(div,'label','flabel',def.labelS||'Fecha aproximada inicio');
+    const is=document.createElement('input');is.type='text';is.id='f-date-approx-start';is.placeholder='Ej: siglo IX, año 800, Edad Media...';
+    mk(div,null,null,null,is);
+    const h=document.createElement('div');h.className='date-hint';h.textContent='Texto libre — la IA interpreta el período';
+    const le=document.createElement('label');le.className='flabel';le.style.marginTop='8px';le.textContent=def.labelE||'Fecha aproximada fin';
+    const ie=document.createElement('input');ie.type='text';ie.id='f-date-approx-end';ie.placeholder='Ej: siglo XV, año 1500...';
+    div.appendChild(is);div.appendChild(h);div.appendChild(le);div.appendChild(ie);
+  } else if(def.f==='regions'){
+    mk(div,'label','flabel',def.label||'Territorios / países / ciudades');
+    div.appendChild(createTerrInput(r=>{if(!entryRegions.includes(r))entryRegions.push(r);renderRegionTags();}));
+    const td=document.createElement('div');td.id='region-tags';td.style.cssText='display:flex;gap:5px;flex-wrap:wrap;margin-top:6px';
+    const gr=document.createElement('div');gr.style.cssText='display:flex;align-items:center;gap:7px;margin-top:7px';
+    const gb=document.createElement('button');gb.type='button';gb.className='btn-s';gb.style.cssText='font-size:11px;padding:4px 10px';gb.innerHTML='<i class="ti ti-map-pin" style="font-size:12px"></i> Sugerir ubicación';gb.onclick=geoSuggest;
+    const gs=document.createElement('span');gs.id='geo-status';gs.style.cssText='font-size:11px;color:var(--text3)';
+    const gi=document.createElement('input');gi.type='text';gi.id='f-geo';gi.placeholder='Coordenadas (lat, lng) — opcional';gi.style.cssText='font-size:12px;margin-top:5px';
+    gr.appendChild(gb);gr.appendChild(gs);
+    div.appendChild(td);div.appendChild(gr);div.appendChild(gi);
+  } else if(def.f==='cats'){
+    mk(div,'label','flabel','Categorías');
+    const cw=document.createElement('div');cw.className='chip-wrap';cw.id='cat-chips';
+    const ar=document.createElement('div');ar.style.cssText='display:flex;gap:6px;margin-top:7px';
+    const ci=document.createElement('input');ci.type='text';ci.id='new-cat';ci.placeholder='Nueva categoría...';ci.style.fontSize='12px';
+    ci.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addCategory();}});
+    const cb=document.createElement('button');cb.type='button';cb.className='btn-s';cb.style.cssText='font-size:12px;padding:5px 10px;white-space:nowrap';cb.textContent='+ Crear';cb.onclick=addCategory;
+    ar.appendChild(ci);ar.appendChild(cb);div.appendChild(cw);div.appendChild(ar);
+  } else if(def.f==='notes'){
+    mk(div,'label','flabel',def.label||'Mis notas personales');
+    const ta=document.createElement('textarea');ta.id='f-notes';ta.placeholder='Reflexiones, conexiones, lo que aprendiste...';
+    div.appendChild(ta);
+  } else if(def.f==='media'){
+    div.appendChild(buildMediaSection());
+  }
+  return div;
+}
+
+function mk(parent,tag,cls,text,el){
+  if(!tag){if(el)parent.appendChild(el);return;}
+  const e=document.createElement(tag);if(cls)e.className=cls;if(text)e.textContent=text;
+  parent.appendChild(e);return e;
+}
+
+function buildDateRow(dayId,monthId,yearId){
+  const row=document.createElement('div');row.style.cssText='display:grid;grid-template-columns:70px 1fr 120px;gap:5px;align-items:start';
+  const d=document.createElement('input');d.type='number';d.id=dayId;d.placeholder='Día';d.min=1;d.max=31;
+  const mw=createMonthPicker(monthId);
+  const y=document.createElement('input');y.type='number';y.id=yearId;y.placeholder='Año';
+  row.appendChild(d);row.appendChild(mw);row.appendChild(y);
+  return row;
+}
+
+function buildMediaSection(){
+  const section=document.createElement('div');
+  mk(section,'label','flabel','Referencias y multimedia');
+  const cont=document.createElement('div');cont.className='media-section';cont.id='media-container';
+  entryMediaGroups={};
+  Object.keys(MEDIA_ICONS).forEach(t=>{
+    entryMediaGroups[t]=[];
+    const grp=document.createElement('div');grp.className='media-group';grp.id='mg-'+t;
+    const hd=document.createElement('div');hd.className='media-group-hd';
+    hd.innerHTML=`<span>${t.charAt(0).toUpperCase()+t.slice(1)}</span>`;
+    const ab=document.createElement('button');ab.type='button';ab.className='add-media-btn';ab.innerHTML='<i class="ti ti-plus" style="font-size:11px"></i> Agregar';ab.onclick=()=>addMediaItem(t);
+    hd.appendChild(ab);
+    const items=document.createElement('div');items.id='mi-'+t;
+    grp.appendChild(hd);grp.appendChild(items);cont.appendChild(grp);
+    addMediaItem(t);
+  });
+  section.appendChild(cont);return section;
+}
+
+function addMediaItem(type){
+  const container=document.getElementById('mi-'+type);if(!container)return;
+  if(!entryMediaGroups[type])entryMediaGroups[type]=[];
+  const idx=entryMediaGroups[type].length;
+  const id=`m-${type}-${idx}`;
+  entryMediaGroups[type].push(id);
+  const row=document.createElement('div');row.className='media-item';row.id='mr-'+id;
+  const lbl=document.createElement('span');lbl.className='media-lbl';lbl.textContent=type;
+  const inp=document.createElement('input');inp.type='text';inp.id=id;inp.style.flex='1';inp.style.fontSize='12px';
+  const phs={youtube:'URL del video...',pelicula:'Título · año...',serie:'Título · temporadas...',documental:'Título · año...',libro:'Título · Autor...',imagen:'URL de imagen...',enlace:'URL...'};
+  inp.placeholder=phs[type]||'Ingresá el dato...';
+  const rm=document.createElement('button');rm.type='button';rm.className='rm-btn';rm.innerHTML='<i class="ti ti-x"></i>';
+  rm.onclick=()=>{row.remove();entryMediaGroups[type]=entryMediaGroups[type].filter(x=>x!==id);};
+  row.appendChild(lbl);row.appendChild(inp);row.appendChild(rm);
+  container.appendChild(row);
+}
+
+function renderRegionTags(){
+  const div=document.getElementById('region-tags');if(!div)return;
+  div.innerHTML=entryRegions.map(r=>`<span class="tag" style="background:var(--bg2);color:var(--text2);border-color:var(--border);display:inline-flex;align-items:center;gap:4px">${r}<span onclick="removeRegion('${r.replace(/'/g,"\\'")}');event.stopPropagation()" style="cursor:pointer;color:var(--text3);font-size:13px;line-height:1">×</span></span>`).join('');
+}
+function removeRegion(r){entryRegions=entryRegions.filter(x=>x!==r);renderRegionTags();}
+function renderCategories(){
+  const wrap=document.getElementById('cat-chips');if(!wrap)return;
+  wrap.innerHTML=DB.categories.map(c=>`<span class="chip" data-cat="${c}" onclick="this.classList.toggle('on')">${c}</span>`).join('');
+}
+function addCategory(){
+  const inp=document.getElementById('new-cat');if(!inp)return;
+  const val=inp.value.trim().toLowerCase();if(!val)return;
+  if(!DB.categories.includes(val)){DB.categories.push(val);saveDB();}
+  inp.value='';renderCategories();
+  setTimeout(()=>{const ch=document.querySelector(`[data-cat="${val}"]`);if(ch)ch.classList.add('on');},50);
+}
+
+function prepareForm(type){
+  type=type||'suceso';
+  document.getElementById('current-type').value=type;
+  document.getElementById('agregar-title').textContent=(currentEditId?'Editar':'Nueva')+' — '+TYPE_LBL[type];
+  document.getElementById('save-lbl').textContent=currentEditId?'Guardar cambios':'Guardar en bitácora';
+  document.getElementById('type-pills').innerHTML=Object.keys(TYPE_LBL).map(t=>`<span class="chip${t===type?' on':''}" onclick="prepareForm('${t}')" style="white-space:nowrap"><i class="ti ${TYPE_ICON[t]}"></i> ${TYPE_LBL[t]}</span>`).join('');
+  buildForm(type);
+}
+
+// ===== AI AUTOFILL =====
+async function autoFillForm(titleOrText,type){
+  const btn=document.getElementById('ai-fill-btn');if(btn){btn.classList.add('loading');btn.textContent='Completando...';}
+  const prompt=`Entrada tipo "${TYPE_LBL[type]}" sobre: "${titleOrText}". JSON sin markdown:\n{"titulo":"...","año_inicio":"número entero o vacío","año_fin":"número entero o vacío","regiones":["país1"],"categorias":["cat1"],"descripcion":"breve descripción","rol":"si personaje","origen":"si personaje","caracteristicas":"si civilización"}`;
+  try{
+    const res=await callClaude(prompt);
+    const data=JSON.parse(res.replace(/```json|```/g,'').trim());
+    const set=(id,val)=>{const el=document.getElementById(id);if(el&&val!==undefined&&val!==null&&String(val).trim())el.value=val;};
+    if(data.titulo&&!document.getElementById('f-title')?.value)set('f-title',data.titulo);
+    if(data.año_inicio)set('f-year',data.año_inicio);
+    if(data.año_fin)set('f-year-end',data.año_fin);
+    if(data.descripcion){set('f-notes',data.descripcion);set('f-description',data.descripcion);set('f-characteristics',data.caracteristicas||data.descripcion);}
+    if(data.rol)set('f-role',data.rol);if(data.origen)set('f-origin',data.origen);
+    if(data.regiones?.length){data.regiones.forEach(r=>{if(!entryRegions.includes(r))entryRegions.push(r);});renderRegionTags();}
+    if(data.categorias?.length){
+      data.categorias.forEach(c=>{if(!DB.categories.includes(c))DB.categories.push(c);});
+      renderCategories();
+      setTimeout(()=>{document.querySelectorAll('[data-cat]').forEach(ch=>ch.classList.toggle('on',data.categorias.includes(ch.dataset.cat)));},50);
+    }
+    if(type==='concepto'){
+      const as=document.getElementById('f-date-approx-start');const ae=document.getElementById('f-date-approx-end');
+      if(as&&data.año_inicio)as.value=data.año_inicio+' d.C.';
+      if(ae&&data.año_fin)ae.value=data.año_fin+' d.C.';
+    }
+    showToast('Campos completados — revisá y ajustá');
+  }catch(e){showToast('No se pudo autocompletar. Completá manualmente.');}
+  if(btn){btn.classList.remove('loading');btn.textContent='Autocompletar ahora';}
+}
+async function manualAIFill(type){
+  const title=document.getElementById('f-title')?.value.trim()||'';
+  if(!title){showToast('Escribí el nombre primero');return;}
+  await autoFillForm(title,type);
+}
+
+// ===== DATE HELPERS =====
+function getMonthVal(id){return monthPickerInstances[id]?.getVal()||null;}
+function buildDateFromIds(dayId,monthId,yearId){
+  const y=document.getElementById(yearId)?.value;if(!y&&y!==0)return null;
+  const yr=parseInt(y);if(isNaN(yr))return null;
+  return{day:parseInt(document.getElementById(dayId)?.value)||null,month:getMonthVal(monthId),year:yr};
+}
+function buildDateFromApprox(id){
+  const el=document.getElementById(id);if(!el||!el.value.trim())return null;
+  const parsed=parseDateText(el.value);
+  return parsed?{year:parsed.year,approx:true,raw:el.value}:null;
+}
+function formatDate(d){
+  if(!d||(!d.year&&d.year!==0))return '—';
+  if(d.raw)return d.raw;
+  let s='';
+  if(d.day)s+=d.day+' de ';
+  if(d.month)s+=MES[d.month]+' de ';
+  s+=d.year<0?Math.abs(d.year)+' a.C.':d.year+' d.C.';
+  if(d.approx)s+=' (aprox.)';
+  return s;
+}
+function dateToNum(d){if(!d)return null;return(d.year||0)+(d.month||0)/12+(d.day||0)/365;}
+const CURRENT_YEAR=new Date().getFullYear();
+function getFieldVal(id){const el=document.getElementById(id);return el?el.value.trim():'';}
+
+// ===== SAVE ENTRY =====
+function saveEntry(){
+  const type=document.getElementById('current-type').value||'suceso';
+  const title=getFieldVal('f-title');if(!title){showToast('Ingresá un nombre');return;}
+  let dateStart,dateEnd;
+  if(type==='concepto'){
+    dateStart=buildDateFromApprox('f-date-approx-start')||buildDateFromIds('f-day','f-month','f-year');
+    dateEnd=buildDateFromApprox('f-date-approx-end')||buildDateFromIds('f-day-end','f-month-end','f-year-end');
+  } else {
+    dateStart=buildDateFromIds('f-day','f-month','f-year');
+    dateEnd=buildDateFromIds('f-day-end','f-month-end','f-year-end');
+  }
+  // Collect ALL media items
+  const media=[];
+  Object.entries(entryMediaGroups).forEach(([t,ids])=>{
+    ids.forEach(id=>{
+      const el=document.getElementById(id);
+      const v=el?el.value.trim():'';
+      if(v)media.push({type:t,value:v});
+    });
+  });
+  const entry={
+    id:currentEditId||Date.now(),type,title,dateStart,dateEnd,
+    regions:[...entryRegions],
+    cats:[...document.querySelectorAll('[data-cat].on')].map(c=>c.dataset.cat),
+    notes:getFieldVal('f-notes'),geo:getFieldVal('f-geo'),media,
+    bookmarked:currentEditId?(DB.events.find(e=>e.id===currentEditId)||{}).bookmarked||false:false,
+    origin:getFieldVal('f-origin'),role:getFieldVal('f-role'),
+    characteristics:getFieldVal('f-characteristics'),description:getFieldVal('f-description'),
+    capital:getFieldVal('f-capital'),government:getFieldVal('f-government'),
+    author:getFieldVal('f-author'),sourceType:getFieldVal('f-source-type'),
+    topic:getFieldVal('f-topic'),link:getFieldVal('f-link'),
+    created:currentEditId?(DB.events.find(e=>e.id===currentEditId)||{}).created||new Date().toISOString():new Date().toISOString()
+  };
+  if(currentEditId){DB.events=DB.events.map(e=>e.id===currentEditId?entry:e);showToast('Entrada actualizada');}
+  else{DB.events.push(entry);showToast('Guardado en bitácora');}
+  currentEditId=null;saveDB();clearForm();nav(prevScreen==='agregar'?'bitacora':prevScreen||'bitacora');
+}
+
+function clearForm(){
+  document.getElementById('dynamic-form').innerHTML='';
+  document.getElementById('ai-fill-zone').innerHTML='';
+  document.getElementById('edit-id').value='';
+  document.getElementById('current-type').value='suceso';
+  document.getElementById('agregar-title').textContent='Nueva entrada';
+  document.getElementById('save-lbl').textContent='Guardar';
+  document.getElementById('type-pills').innerHTML='';
+  document.getElementById('voice-status').textContent='Dictá o escribí el nombre — la IA completa los campos';
+  document.getElementById('voice-transcript').style.display='none';
+  entryRegions=[];entryMediaGroups={};monthPickerInstances={};currentEditId=null;
+}
+
+// ===== REGION COLOR =====
+function regionColor(regions){
+  if(!regions||!regions.length)return isDark()?'#a0a0a8':'#5F5E5A';
+  const r=(regions[0]||'').toLowerCase();
+  if(/europa|france|inglat|alemania|italia|rusia|españa|portugal|grecia|roma|austria|hungría|polonia/.test(r))return isDark()?'#5aabdf':'#185FA5';
+  if(/asia|china|japón|india|mongol|corea|vietnam|tailandia|persia/.test(r))return isDark()?'#60c060':'#3B6D11';
+  if(/améric|mexico|argentina|brasil|estados unidos|paraguay|chile|perú|colombia|bolivia|venezuela|uruguay/.test(r))return isDark()?'#e0a040':'#854F0B';
+  if(/africa|áfrica|egipto|sudáfrica|nigeria|etiopía|marruecos/.test(r))return isDark()?'#e06080':'#993556';
+  if(/medio oriente|otomano|turquía|iraq|siria|arabia|israel|jordania|irán/.test(r))return isDark()?'#e06060':'#A32D2D';
+  if(/oceanía|oceania|australia|nueva zelanda/.test(r))return isDark()?'#40c0b0':'#0F6E56';
+  return isDark()?'#a0a0a8':'#5F5E5A';
+}
+
+// ===== FILTERS =====
+function toggleFilters(){
+  const p=document.getElementById('filter-panel');p.classList.toggle('open');
+  if(p.classList.contains('open'))renderTerrFilterChips();
+}
+function renderTerrFilterChips(){
+  const allT=[...new Set(DB.events.flatMap(e=>e.regions||[]))];
+  document.getElementById('terr-filter-chips').innerHTML=allT.map(t=>`<span class="tfc${activeTerrFilters.has(t)?' on':''}" onclick="toggleTerrFilter('${t.replace(/'/g,"\\'")}')"><i class="ti ti-map-pin" style="font-size:11px"></i>${t}</span>`).join('');
+}
+function toggleTerrFilter(t){if(activeTerrFilters.has(t))activeTerrFilters.delete(t);else activeTerrFilters.add(t);renderTerrFilterChips();renderTimeline();}
+function clearTerrFilter(){activeTerrFilters.clear();renderTerrFilterChips();renderTimeline();}
+
+// ===== TIME NAVIGATOR =====
+function goToTime(){
+  const val=document.getElementById('nav-year-inp').value.trim();if(!val)return;
+  let year=null;
+  const sigloMatch=val.match(/siglo\s+(\w+)/i);
+  if(sigloMatch){
+    const siglos={'i':100,'ii':200,'iii':300,'iv':400,'v':500,'vi':600,'vii':700,'viii':800,'ix':900,'x':1000,'xi':1100,'xii':1200,'xiii':1300,'xiv':1400,'xv':1500,'xvi':1600,'xvii':1700,'xviii':1800,'xix':1900,'xx':2000,'xxi':2100};
+    year=(siglos[sigloMatch[1].toLowerCase()]||0)-100;
+  } else {
+    const parsed=parseDateText(val);if(parsed)year=parsed.year;else year=parseInt(val);
+  }
+  if(!year&&year!==0){showToast('No se pudo interpretar');return;}
+  navigateToYear(year);
+  showToast('Navegando a '+(year<0?Math.abs(year)+' a.C.':year+' d.C.'));
+}
+
+function goToEra(startY,endY,name){
+  const W=document.getElementById('htl-canvas').offsetWidth||600;
+  const evts=DB.events.filter(e=>e.dateStart&&e.dateStart.year!=null);
+  if(!evts.length){showToast('No hay entradas todavía');return;}
+  const allNums=evts.flatMap(e=>[dateToNum(e.dateStart),e.dateEnd?dateToNum(e.dateEnd):null]).filter(x=>x!=null);
+  const minY=Math.min(...allNums)-5;const maxY=Math.max(...allNums)+5;const span=maxY-minY;
+  const eraSpan=endY-startY;
+  // Set zoom so era fits in canvas
+  htlSpan=eraSpan*1.2;
+  htlZoom=(W/span)*(span/htlSpan);
+  htlZoom=Math.max(.1,Math.min(30,htlZoom));
+  const centerY=(startY+endY)/2;
+  htlOffset=W/2-((centerY-minY)/span)*W*htlZoom;
+  updateZoomLabel();renderHTL();
+  showToast(name||'Era seleccionada');
+}
+
+function navigateToYear(year){
+  const evts=DB.events.filter(e=>e.dateStart&&e.dateStart.year!=null);
+  if(!evts.length)return;
+  const allNums=evts.flatMap(e=>[dateToNum(e.dateStart),e.dateEnd?dateToNum(e.dateEnd):null]).filter(x=>x!=null);
+  const minY=Math.min(...allNums)-5;const maxY=Math.max(...allNums)+5;const span=maxY-minY;
+  const W=document.getElementById('htl-canvas').offsetWidth||600;
+  htlOffset=W/2-((year-minY)/span)*W*htlZoom;
+  renderHTL();
+}
+
+function setZoomPreset(years){
+  const W=document.getElementById('htl-canvas').offsetWidth||600;
+  const evts=DB.events.filter(e=>e.dateStart&&e.dateStart.year!=null);
+  if(!evts.length){showToast('No hay entradas todavía');return;}
+  const allNums=evts.flatMap(e=>[dateToNum(e.dateStart),e.dateEnd?dateToNum(e.dateEnd):null]).filter(x=>x!=null);
+  const span=(Math.max(...allNums))-(Math.min(...allNums))+10;
+  htlSpan=years;
+  htlZoom=Math.max(.1,Math.min(30,(W/span)*(span/years)));
+  updateZoomLabel();renderHTL();
+  document.querySelectorAll('.htl-preset').forEach(b=>{
+    const y=parseInt(b.getAttribute('onclick').match(/\d+/)?.[0]);
+    b.classList.toggle('active',y===years);
+  });
+}
+
+function zoomHTL(d){
+  const W=document.getElementById('htl-canvas').offsetWidth||600;
+  const evts=DB.events.filter(e=>e.dateStart&&e.dateStart.year!=null);
+  if(!evts.length)return;
+  const allNums=evts.flatMap(e=>[dateToNum(e.dateStart),e.dateEnd?dateToNum(e.dateEnd):null]).filter(x=>x!=null);
+  const span=(Math.max(...allNums))-(Math.min(...allNums))+10;
+  const centerX=W/2;
+  const centerYear=(centerX-htlOffset)/(W*htlZoom/span)+(Math.min(...allNums)-5);
+  const factor=d>0?1.5:1/1.5;
+  htlZoom=Math.max(.05,Math.min(50,htlZoom*factor));
+  // Keep center fixed
+  htlOffset=centerX-((centerYear-(Math.min(...allNums)-5))/span)*W*htlZoom;
+  htlSpan=span/htlZoom*(W/(W||600));
+  updateZoomLabel();renderHTL();
+}
+
+function updateZoomLabel(){
+  const W=document.getElementById('htl-canvas').offsetWidth||600;
+  const evts=DB.events.filter(e=>e.dateStart&&e.dateStart.year!=null);
+  if(!evts.length)return;
+  const allNums=evts.flatMap(e=>[dateToNum(e.dateStart),e.dateEnd?dateToNum(e.dateEnd):null]).filter(x=>x!=null);
+  const span=(Math.max(...allNums))-(Math.min(...allNums))+10;
+  const visYears=Math.round(span/htlZoom);
+  let lbl='';
+  if(visYears>=2000)lbl=`vista de ${Math.round(visYears/1000)} mil años`;
+  else if(visYears>=100)lbl=`vista de ${visYears} años`;
+  else if(visYears>=10)lbl=`vista de ${visYears} años`;
+  else if(visYears>=2)lbl=`vista de ${visYears} años`;
+  else lbl='vista de meses';
+  const el=document.getElementById('htl-zoom-lbl');if(el)el.textContent=lbl;
+}
+
+function resetHTL(){htlZoom=1;htlOffset=0;updateZoomLabel();renderHTL();}
+
+// ===== RENDER TIMELINE VERTICAL =====
+function renderTimeline(){
+  const typeF=document.getElementById('tl-ftype')?.value||'';
+  const catF=document.getElementById('tl-fcat')?.value||'';
+  const bmF=document.getElementById('tl-fbm')?.checked||false;
+  let evts=DB.events.filter(e=>{
+    if(typeF&&e.type!==typeF)return false;
+    if(catF&&!(e.cats||[]).includes(catF))return false;
+    if(bmF&&!e.bookmarked)return false;
+    if(activeTerrFilters.size>0&&!(e.regions||[]).some(r=>activeTerrFilters.has(r)))return false;
+    return true;
+  }).sort((a,b)=>(dateToNum(a.dateStart)||0)-(dateToNum(b.dateStart)||0));
+
+  const total=DB.events.length;
+  const el=document.getElementById('tl-count');if(el)el.textContent=total+' entrada'+(total!==1?'s':'')+(activeTerrFilters.size>0?` · ${[...activeTerrFilters].join(', ')}`:'');
+
+  const catSel=document.getElementById('tl-fcat');
+  if(catSel){const cur=catSel.value;catSel.innerHTML='<option value="">Todas las categorías</option>'+DB.categories.map(c=>`<option value="${c}"${c===cur?'selected':''}>${c}</option>`).join('');}
+
+  if(evts.length===0){
+    document.getElementById('tl-empty').style.display='flex';
+    document.getElementById('tl-wrap').style.display='none';
+    return;
+  }
+  document.getElementById('tl-empty').style.display='none';
+  document.getElementById('tl-wrap').style.display='block';
+
+  const me=DB.me;
+  document.getElementById('tl-entries').innerHTML=evts.map(e=>{
+    const col=TYPE_COL[e.type]||regionColor(e.regions);
+    const tcol=TYPE_COL[e.type]||col;
+    const bg=typeBG(e.type);const bd=typeBD(e.type);
+    const cats=(e.cats||[]).map(c=>`<span class="tag" style="background:${tcol}22;color:${tcol};border-color:${tcol}55">${c}</span>`).join('');
+    const regs=(e.regions||[]).map(r=>`<span class="tag" style="background:${regionColor([r])}22;color:${regionColor([r])};border-color:${regionColor([r])}55">${r}</span>`).join('');
+    const mediaPills=(e.media||[]).slice(0,4).map(m=>`<span class="mpill"><i class="ti ${MEDIA_ICONS[m.type]||'ti-link'}"></i>${m.type}</span>`).join('');
+    const isAlive=(e.type==='personaje'||e.type==='pais')&&(!e.dateEnd||!e.dateEnd.year);
+    const dateStr=(e.dateEnd&&e.dateEnd.year)||isAlive?`${formatDate(e.dateStart)} — ${isAlive?'presente':formatDate(e.dateEnd)}`:formatDate(e.dateStart);
+    let thumbHTML=`<i class="ti ti-${TYPE_ICON[e.type]||'ti-timeline-event'}"></i>`;
+    const imgM=(e.media||[]).find(m=>m.type==='imagen');if(imgM)thumbHTML=`<img src="${imgM.value}" alt="" onerror="this.parentElement.innerHTML='<i class=ti ti-photo></i>'">`;
+    const connCount=(DB.connections||[]).filter(c=>c.from===e.id||c.to===e.id).length;
+    let meOverlap='';
+    if(me?.year&&e.dateStart?.year&&e.dateStart.year>=me.year&&e.dateStart.year<=CURRENT_YEAR)meOverlap=`<span class="tag" style="background:var(--gold-bg);color:var(--gold);border-color:var(--gold-border)">en tu vida</span>`;
+    return `<div class="tl-entry" onclick="openDetail(${e.id})">
+      <div class="tl-year">${formatDate(e.dateStart)}</div>
+      <div class="tl-dot" style="background:${tcol}"></div>
+      <div class="tl-card${e.bookmarked?' bookmarked':''}">
+        <div class="tl-card-head">
+          <div class="tl-title">${e.title}${isAlive?'<span style="font-size:9px;margin-left:5px;color:var(--success);background:var(--success-bg);padding:1px 6px;border-radius:10px;border:1px solid var(--success-border);font-weight:600">vive</span>':''}</div>
+          <span class="type-badge" style="background:${bg};color:${tcol};border-color:${bd}">${TYPE_LBL[e.type]||'Suceso'}</span>
+          <button class="bm-btn${e.bookmarked?' on':''}" onclick="event.stopPropagation();quickBookmark(${e.id})"><i class="ti ti-bookmark${e.bookmarked?'-filled':''}"></i></button>
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:1px">${dateStr}</div>
+        ${e.notes?`<div class="tl-desc">${e.notes.substring(0,100)}${e.notes.length>100?'…':''}</div>`:''}
+        ${e.description&&!e.notes?`<div class="tl-desc">${e.description.substring(0,80)}…</div>`:''}
+        <div style="display:flex;align-items:center;gap:5px;margin-top:5px;flex-wrap:wrap">
+          ${regs}${cats}${meOverlap}${mediaPills}
+          ${connCount>0?`<span class="mpill" style="background:var(--info-bg);color:var(--info);border-color:var(--info-border)"><i class="ti ti-link" style="font-size:11px"></i>${connCount}</span>`:''}
+        </div>
+      </div>
+      <div class="tl-tooltip">
+        <div class="tt-thumb">${thumbHTML}</div>
+        <div class="tt-title">${e.title}</div>
+        <div class="tt-body">${(e.notes||e.description||'Sin notas aún.').substring(0,100)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  renderHTL();
+}
+
+function quickBookmark(id){
+  const e=DB.events.find(x=>x.id===id);if(!e)return;
+  e.bookmarked=!e.bookmarked;saveDB();renderTimeline();
+  showToast(e.bookmarked?'Marcado':'Marca removida');
+}
+
+// ===== HTL =====
+function renderHTL(){
+  const canvas=document.getElementById('htl-canvas');
+  const evts=DB.events.filter(e=>e.dateStart&&e.dateStart.year!=null&&activeLayers.has(e.type||'suceso'));
+  if(evts.length===0){canvas.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:11px;color:var(--text3)">Agregá entradas para ver la línea de tiempo</div>';return;}
+
+  const nums=evts.flatMap(e=>{
+    const s=dateToNum(e.dateStart);
+    const isAlive=(e.type==='personaje'||e.type==='pais')&&(!e.dateEnd||!e.dateEnd.year);
+    const end=isAlive?CURRENT_YEAR:(e.dateEnd?dateToNum(e.dateEnd):null);
+    return[s,end].filter(x=>x!=null);
+  });
+  if(DB.me?.year)nums.push(DB.me.year);
+  const minY=Math.min(...nums)-5;const maxY=Math.max(...nums)+5;const span=maxY-minY;
+  const W=canvas.offsetWidth||600;const scaledW=W*htlZoom;
+  const AXIS_Y=72;
+
+  // Calibrated drag: offset in screen pixels, scale by zoom
+  function xPos(n){return((n-minY)/span)*scaledW+htlOffset;}
+
+  // Dynamic tick scale based on visible range
+  const visYears=span/htlZoom;
+  let tickStep=100;
+  if(visYears>10000)tickStep=2000;else if(visYears>5000)tickStep=1000;
+  else if(visYears>2000)tickStep=500;else if(visYears>1000)tickStep=200;
+  else if(visYears>500)tickStep=100;else if(visYears>200)tickStep=50;
+  else if(visYears>100)tickStep=20;else if(visYears>50)tickStep=10;
+  else if(visYears>20)tickStep=5;else if(visYears>10)tickStep=2;
+  else if(visYears>3)tickStep=1;else tickStep=1/12;
+
+  let html=`<div style="position:absolute;left:0;right:0;top:${AXIS_Y}px;height:2px;background:var(--border2)"></div>`;
+
+  // Draw ticks
+  const ft=Math.ceil(minY/tickStep)*tickStep;
+  for(let t=ft;t<=maxY;t+=tickStep){
+    const x=xPos(t);if(x<-80||x>scaledW+80)continue;
+    const isMaj=Math.abs(t%(tickStep*5))<tickStep*0.01;
+    let lbl='';
+    if(tickStep>=1){lbl=t<0?Math.abs(Math.round(t))+' a.C.':Math.round(t)+' d.C.';}
+    else{const m=Math.round(t*12)%12+1;lbl=MES_SHORT[m]||'';}
+    html+=`<div style="position:absolute;left:${x}px;top:${AXIS_Y}px;display:flex;flex-direction:column;align-items:center;pointer-events:none;transform:translateX(-50%)">
+      <div style="width:1px;height:${isMaj?12:6}px;background:var(--border2)"></div>
+      <div style="font-size:${isMaj?10:8}px;color:${isMaj?'var(--text2)':'var(--text3)'};margin-top:1px;white-space:nowrap;font-weight:${isMaj?600:400}">${lbl}</div>
+    </div>`;
+  }
+
+  // User life bar
+  if(DB.me?.year){
+    const xS=xPos(DB.me.year);const xE=xPos(CURRENT_YEAR);
+    const w=Math.max(xE-xS,4);
+    html+=`<div style="position:absolute;left:${xS}px;top:${AXIS_Y+2}px;width:${w}px;height:10px;background:var(--gold);opacity:.2;border-radius:5px;pointer-events:none" title="Tu vida (${DB.me.year}–presente)"></div>`;
+  }
+
+  // Events
+  evts.sort((a,b)=>(dateToNum(a.dateStart)||0)-(dateToNum(b.dateStart)||0)).forEach((e,i)=>{
+    const col=TYPE_COL[e.type]||'#5aabdf';
+    const sn=dateToNum(e.dateStart);if(sn===null)return;
+    const x=xPos(sn);
+    const isAlive=(e.type==='personaje'||e.type==='pais')&&(!e.dateEnd||!e.dateEnd.year);
+    const hasEnd=(e.dateEnd&&e.dateEnd.year)||isAlive;
+
+    if(e.type==='concepto'){
+      const en=isAlive?CURRENT_YEAR:(e.dateEnd?dateToNum(e.dateEnd):sn+200);
+      const x2=xPos(en);const w=Math.max(x2-x,30);
+      const lane=i%3;const y=AXIS_Y-26-(lane*14);
+      html+=`<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;height:14px;background:linear-gradient(to right,transparent,${col}66 20%,${col}99 50%,${col}66 80%,transparent);border-radius:7px;cursor:pointer;display:flex;align-items:center;padding:0 8px;overflow:hidden" onclick="openDetail(${e.id})" title="${e.title}">
+        <span style="font-size:8px;color:${col};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">${e.title}</span>
+      </div>`;
+    } else if(!hasEnd||e.type==='suceso'||e.type==='fuente'){
+      const lane=i%4;const y=AXIS_Y-16-(lane*14);
+      html+=`<div style="position:absolute;left:${x}px;top:${y}px;cursor:pointer;z-index:5;transform:translateX(-50%)" onclick="openDetail(${e.id})" title="${e.title}">
+        <div style="width:11px;height:11px;border-radius:50%;background:${col};border:2px solid var(--bg);margin:0 auto;transition:transform .15s" onmouseover="this.style.transform='scale(1.5)'" onmouseout="this.style.transform='scale(1)'"></div>
+        <div style="font-size:9px;color:${col};text-align:center;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px;font-weight:500">${e.title}</div>
+      </div>`;
+    } else {
+      const en=isAlive?CURRENT_YEAR:dateToNum(e.dateEnd);
+      const x2=xPos(en);const w=Math.max(x2-x,6);
+      const lane=i%4;const y=AXIS_Y+5+(lane*12);
+      const endStyle=isAlive?`border-right:2px dashed ${col};border-radius:5px 0 0 5px`:'border-radius:5px';
+      html+=`<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;height:11px;background:${col};${endStyle};opacity:.88;cursor:pointer;display:flex;align-items:center;padding:0 5px;overflow:hidden;z-index:4" onclick="openDetail(${e.id})" title="${e.title}${isAlive?' (activo)':''}">
+        <span style="font-size:8px;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">${e.title}</span>
+      </div>`;
+    }
+  });
+
+  // Connection lines
+  (DB.connections||[]).forEach(conn=>{
+    const ea=DB.events.find(x=>x.id===conn.from);const eb=DB.events.find(x=>x.id===conn.to);
+    if(!ea||!eb||!ea.dateStart||!eb.dateStart)return;
+    const xa=xPos(dateToNum(ea.dateStart));const xb=xPos(dateToNum(eb.dateStart));
+    if(Math.max(xa,xb)<-100||Math.min(xa,xb)>scaledW+100)return;
+    html+=`<div style="position:absolute;left:${Math.min(xa,xb)}px;top:${AXIS_Y-1}px;width:${Math.abs(xb-xa)}px;height:2px;background:var(--gold);opacity:.35;pointer-events:none;border-radius:1px"></div>`;
+  });
+
+  canvas.innerHTML=html;canvas.style.minWidth=scaledW+'px';
+
+  // Calibrated drag
+  canvas.onmousedown=ev=>{
+    htlDragging=true;htlDragStart=ev.clientX;htlOffsetStart=htlOffset;
+    canvas.classList.add('grabbing');ev.preventDefault();
+  };
+  window.onmousemove=ev=>{
+    if(!htlDragging)return;
+    // Drag speed = 1:1 pixel regardless of zoom
+    htlOffset=htlOffsetStart+(ev.clientX-htlDragStart);
+    renderHTL();
+  };
+  window.onmouseup=()=>{if(htlDragging){htlDragging=false;canvas.classList.remove('grabbing');}};
+  canvas.ontouchstart=ev=>{htlDragging=true;htlDragStart=ev.touches[0].clientX;htlOffsetStart=htlOffset;ev.preventDefault();};
+  canvas.ontouchmove=ev=>{if(!htlDragging)return;ev.preventDefault();htlOffset=htlOffsetStart+(ev.touches[0].clientX-htlDragStart);renderHTL();};
+  canvas.ontouchend=()=>{htlDragging=false;};
+
+  updateZoomLabel();
+}
+
+function toggleLayer(el){
+  const l=el.dataset.layer;
+  if(activeLayers.has(l)){activeLayers.delete(l);el.classList.remove('on');el.style.opacity='.35';}
+  else{activeLayers.add(l);el.classList.add('on');el.style.opacity='1';}
+  renderTimeline();
+}
+
+// ===== PENDING =====
+function sortPend(col){if(pendSortCol===col)pendSortAsc=!pendSortAsc;else{pendSortCol=col;pendSortAsc=true;}renderPending();}
+function renderPending(){
+  const search=document.getElementById('pend-search')?.value.toLowerCase()||'';
+  const dispF=document.getElementById('pend-fdisp')?.value||'';
+  const escF=document.getElementById('pend-fesc')?.value||'';
+  const sortSel=document.getElementById('pend-sort')?.value||'created';
+  const scOrd={civilización:1,'proceso histórico':2,'evento puntual':3,personaje:4};
+  let items=DB.pending.filter(p=>{
+    if(search&&!p.nombre.toLowerCase().includes(search))return false;
+    if(dispF&&p.disparador!==dispF)return false;
+    if(escF&&p.escala!==escF)return false;
+    return true;
+  }).sort((a,b)=>{
+    const col=pendSortCol||sortSel;let va,vb;
+    if(col==='nombre'){va=a.nombre;vb=b.nombre;}
+    else if(col==='escala'){va=scOrd[a.escala]||9;vb=scOrd[b.escala]||9;}
+    else if(col==='disparador'){va=a.disparador;vb=b.disparador;}
+    else if(col==='epoca'){va=a.epoca;vb=b.epoca;}
+    else{va=b.created;vb=a.created;}
+    if(va<vb)return pendSortAsc?-1:1;if(va>vb)return pendSortAsc?1:-1;return 0;
+  });
+  const el=document.getElementById('pend-topcount');if(el)el.textContent=DB.pending.length+' idea'+(DB.pending.length!==1?'s':'');
+  const empty=document.getElementById('pend-empty');if(empty)empty.style.display=items.length===0?'block':'none';
+  const scCol={civilización:'#5aabdf','proceso histórico':'#60c060','evento puntual':'#e0a040',personaje:'#e06080'};
+  const tbody=document.getElementById('pend-tbody');if(!tbody)return;
+  tbody.innerHTML=items.map(p=>{
+    const col=scCol[p.escala]||'var(--text3)';
+    const refHTML=p.ref?(p.ref.startsWith('http')?`<a href="${p.ref}" target="_blank" style="font-size:10px;color:var(--info);text-decoration:none;display:inline-flex;align-items:center;gap:3px"><i class="ti ti-external-link" style="font-size:11px"></i>ver</a>`:`<span style="font-size:10px;color:var(--text2)">${p.ref.substring(0,18)}</span>`):'-';
+    return `<tr>
+      <td style="font-weight:600;max-width:150px;font-size:12px">${p.nombre}</td>
+      <td>${p.disparador?`<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text2)"><i class="ti ${DISP_ICONS[p.disparador]||'ti-link'}" style="font-size:13px"></i>${p.disparador}</span>`:'-'}</td>
+      <td style="color:var(--text2);font-size:11px">${p.epoca||'—'}</td>
+      <td>${p.escala?`<span class="tag" style="background:${col}22;color:${col};border-color:${col}55">${p.escala}</span>`:'-'}</td>
+      <td>${refHTML}</td>
+      <td style="white-space:nowrap">
+        <button onclick="editPending(${p.id})" style="padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;margin-right:2px" title="Editar"><i class="ti ti-edit" style="font-size:12px"></i></button>
+        <button onclick="moveToStudy(${p.id})" style="padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;margin-right:2px" title="Estudiar"><i class="ti ti-arrow-right" style="font-size:12px"></i></button>
+        <button onclick="deletePending(${p.id})" style="padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--danger);cursor:pointer" title="Eliminar"><i class="ti ti-x" style="font-size:12px"></i></button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function editPending(id){
+  const p=DB.pending.find(x=>x.id===id);if(!p)return;
+  document.getElementById('qi-title').value=p.nombre;document.getElementById('qi-epoca').value=p.epoca||'';
+  document.getElementById('qi-escala').value=p.escala||'';document.getElementById('qi-ref').value=p.ref||'';
+  document.getElementById('qi-relacion').value=p.relacion||'';
+  document.querySelectorAll('#qi-disp [data-disp]').forEach(c=>c.classList.toggle('on',c.dataset.disp===p.disparador));
+  const btn=document.getElementById('qi-save-btn');
+  btn.onclick=()=>{
+    const disp=document.querySelector('#qi-disp [data-disp].on');
+    DB.pending=DB.pending.map(x=>x.id===id?{...x,nombre:document.getElementById('qi-title').value.trim(),epoca:document.getElementById('qi-epoca').value.trim(),escala:document.getElementById('qi-escala').value,disparador:disp?disp.dataset.disp:'',ref:document.getElementById('qi-ref').value.trim(),relacion:document.getElementById('qi-relacion').value.trim()}:x);
+    saveDB();closeQuickModal();renderPending();showToast('Idea actualizada');btn.onclick=saveQuickIdea;
+  };
+  openQuickModal();
+}
+function moveToStudy(id){
+  const p=DB.pending.find(x=>x.id===id);if(!p)return;
+  prevScreen='pendientes';nav('agregar');prepareForm('suceso');
+  setTimeout(()=>{const t=document.getElementById('f-title');if(t)t.value=p.nombre;const n=document.getElementById('f-notes');if(n)n.value=p.relacion||'';},100);
+  DB.pending=DB.pending.filter(x=>x.id!==id);saveDB();showToast('Movido — completá los detalles');
+}
+function deletePending(id){if(!confirm('¿Eliminar?'))return;DB.pending=DB.pending.filter(x=>x.id!==id);saveDB();renderPending();}
+
+// ===== YO =====
+function renderMe(){
+  const me=DB.me;
+  if(!me||!me.name){document.getElementById('me-name-display').textContent='Tu nombre';document.getElementById('me-meta-display').textContent='Completá tu perfil';document.getElementById('me-body-display').innerHTML='';document.getElementById('me-hitos').innerHTML='';return;}
+  document.getElementById('me-name-display').textContent=me.name;
+  document.getElementById('me-meta-display').textContent=`${me.day?me.day+' de ':''}${me.month?MES[me.month]+' de ':''}${me.year||''} ${me.place?'· '+me.place:''}`;
+  document.getElementById('me-body-display').innerHTML=me.about?`<div style="font-size:12px;color:var(--text2);line-height:1.6;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin-top:6px">${me.about}</div>`:'';
+  const meContextEl=document.getElementById('me-context');
+  if(me.year){
+    const evts=DB.events.filter(e=>e.dateStart?.year>=me.year&&e.dateStart?.year<=CURRENT_YEAR);
+    meContextEl.innerHTML=evts.length?`<div style="font-size:12px;color:var(--text2);margin-bottom:8px"><strong>${evts.length}</strong> evento${evts.length!==1?'s':''} en tu bitácora ocurrieron durante tu vida:</div>`+
+    evts.map(e=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:10px;color:var(--text3);min-width:70px">${formatDate(e.dateStart)}</span>
+      <span style="font-size:12px">${e.title}</span>
+      <span class="tag" style="background:${typeBG(e.type)};color:${TYPE_COL[e.type]};border-color:${typeBD(e.type)};font-size:9px">${TYPE_LBL[e.type]||'Suceso'}</span>
+    </div>`).join('')
+    :'No hay eventos en tu bitácora que ocurran durante tu vida todavía.';
+  }
+  document.getElementById('me-hitos').innerHTML=(me.hitos||[]).map((h,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 9px;background:var(--bg);border-radius:8px;border:1px solid var(--gold-border);margin-bottom:5px">
+    <i class="ti ti-star" style="font-size:14px;color:var(--gold)"></i>
+    <div style="flex:1"><div style="font-size:13px;font-weight:500">${h.title}</div>
+    <div style="font-size:11px;color:var(--text3)">${h.day?h.day+' de ':''}${h.month?MES[h.month]+' de ':''}${h.year||''}${h.place?' · '+h.place:''}</div></div>
+    <button class="btn-icon" onclick="deleteHito(${i})" style="color:var(--danger)"><i class="ti ti-x" style="font-size:14px"></i></button>
+  </div>`).join('');
+}
+
+function editMe(){
+  const me=DB.me||{};
+  document.getElementById('me-name-inp').value=me.name||'';
+  document.getElementById('me-day').value=me.day||'';
+  document.getElementById('me-year').value=me.year||'';
+  document.getElementById('me-place').value=me.place||'';
+  document.getElementById('me-about').value=me.about||'';
+  const mw=document.getElementById('me-month-wrap');mw.innerHTML='';
+  const mp=createMonthPicker('me-month-pick');mw.appendChild(mp);
+  if(me.month)monthPickerInstances['me-month-pick']?.setVal(me.month);
+  document.getElementById('me-modal-bg').classList.add('open');
+  setTimeout(()=>setupTerrSingleInput('me-place','me-place-drop'),50);
+}
+function saveMe(){
+  DB.me={
+    name:document.getElementById('me-name-inp').value.trim(),
+    day:parseInt(document.getElementById('me-day').value)||null,
+    month:getMonthVal('me-month-pick'),
+    year:parseInt(document.getElementById('me-year').value)||null,
+    place:document.getElementById('me-place').value.trim(),
+    about:document.getElementById('me-about').value.trim(),
+    hitos:DB.me?.hitos||[]
+  };
+  saveDB();document.getElementById('me-modal-bg').classList.remove('open');renderMe();renderTimeline();showToast('Perfil guardado');
+}
+function addHito(){
+  document.getElementById('hito-title').value='';document.getElementById('hito-day').value='';document.getElementById('hito-year').value='';document.getElementById('hito-place').value='';
+  const mw=document.getElementById('hito-month-wrap');mw.innerHTML='';mw.appendChild(createMonthPicker('hito-month-pick'));
+  document.getElementById('hito-modal-bg').classList.add('open');
+}
+function saveHito(){
+  const title=document.getElementById('hito-title').value.trim();if(!title)return;
+  if(!DB.me)DB.me={hitos:[]};if(!DB.me.hitos)DB.me.hitos=[];
+  DB.me.hitos.push({
+    title,
+    day:parseInt(document.getElementById('hito-day').value)||null,
+    month:getMonthVal('hito-month-pick'),
+    year:parseInt(document.getElementById('hito-year').value)||null,
+    place:document.getElementById('hito-place').value.trim()
+  });
+  saveDB();document.getElementById('hito-modal-bg').classList.remove('open');renderMe();showToast('Hito agregado');
+}
+function deleteHito(idx){if(!DB.me?.hitos)return;DB.me.hitos.splice(idx,1);saveDB();renderMe();}
+
+// ===== STATS =====
+function renderStats(){
+  const total=DB.events.length;
+  document.getElementById('stat-grid').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-lbl">Entradas en bitácora</div></div>
+    <div class="stat-card"><div class="stat-num">${DB.pending.length}</div><div class="stat-lbl">Temas pendientes</div></div>
+    <div class="stat-card"><div class="stat-num">${DB.events.filter(e=>e.bookmarked).length}</div><div class="stat-lbl">Marcadas</div></div>
+    <div class="stat-card"><div class="stat-num">${DB.events.filter(e=>e.notes&&e.notes.length>10).length}</div><div class="stat-lbl">Con notas propias</div></div>
+    <div class="stat-card"><div class="stat-num">${(DB.connections||[]).length}</div><div class="stat-lbl">Conexiones</div></div>
+  `;
+  const types={};DB.events.forEach(e=>{types[e.type]=(types[e.type]||0)+1;});
+  document.getElementById('stat-types').innerHTML=Object.entries(types).map(([t,n])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><span style="font-size:11px;min-width:90px;color:${TYPE_COL[t]};font-weight:500">${TYPE_LBL[t]||t}</span><div style="flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden"><div style="height:100%;background:${TYPE_COL[t]};width:${Math.round(n/(total||1)*100)}%;border-radius:4px"></div></div><span style="font-size:11px;color:var(--text3)">${n}</span></div>`).join('');
+  const regions={};DB.events.forEach(e=>(e.regions||[]).forEach(r=>{regions[r]=(regions[r]||0)+1;}));
+  const topR=Object.entries(regions).sort((a,b)=>b[1]-a[1]).slice(0,10);const maxR=topR[0]?topR[0][1]:1;
+  document.getElementById('stat-regions').innerHTML=topR.map(([r,n])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><span style="font-size:11px;min-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${regionColor([r])};font-weight:500">${r}</span><div style="flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden"><div style="height:100%;background:${regionColor([r])};width:${Math.round(n/maxR*100)}%;border-radius:4px"></div></div><span style="font-size:11px;color:var(--text3)">${n}</span></div>`).join('');
+  const cats={};DB.events.forEach(e=>(e.cats||[]).forEach(c=>{cats[c]=(cats[c]||0)+1;}));
+  document.getElementById('stat-cats').innerHTML=Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`<span class="tag" style="background:var(--bg2);color:var(--text2);border-color:var(--border);margin:3px;font-size:11px;padding:3px 9px;display:inline-block">${c} <strong>${n}</strong></span>`).join('');
+}
+
+// ===== STUDY =====
+function initStudy(){
+  studyCards=DB.events.filter(e=>e.notes&&e.notes.length>10);
+  if(!studyCards.length)studyCards=[...DB.events];
+  studyIndex=0;studyFlipped=false;
+  document.getElementById('study-progress').textContent=`${studyCards.length} tarjetas`;
+  loadCard();
+}
+async function loadCard(){
+  if(!studyCards.length){document.getElementById('fc-q').textContent='No hay entradas todavía.';return;}
+  studyFlipped=false;document.getElementById('flashcard').classList.remove('flipped');
+  const e=studyCards[studyIndex%studyCards.length];
+  document.getElementById('fc-q').textContent='Generando pregunta…';
+  document.getElementById('fc-a').textContent='';
+  document.getElementById('study-progress').textContent=`${(studyIndex%studyCards.length)+1} / ${studyCards.length}`;
+  const q=await callClaude(`Sobre "${e.title}" (${formatDate(e.dateStart)}): generá UNA pregunta corta de estudio. Solo la pregunta. En español.`);
+  document.getElementById('fc-q').textContent=q;
+  document.getElementById('fc-a').textContent=e.notes||e.description||'Sin notas cargadas.';
+}
+function flipCard(){studyFlipped=!studyFlipped;document.getElementById('flashcard').classList.toggle('flipped',studyFlipped);}
+function nextCard(){studyIndex++;studyFlipped=false;loadCard();}
+function prevCard(){studyIndex=Math.max(0,studyIndex-1);studyFlipped=false;loadCard();}
+
+// ===== CONNECTIONS =====
+function openConnModal(){
+  if(!currentDetailId)return;
+  document.getElementById('conn-select').innerHTML=DB.events.filter(e=>e.id!==currentDetailId).map(e=>`<option value="${e.id}">${e.title} (${formatDate(e.dateStart)})</option>`).join('');
+  document.getElementById('conn-modal-bg').classList.add('open');
+}
+function saveConnection(){
+  const to=parseInt(document.getElementById('conn-select').value);
+  const type=document.getElementById('conn-type').value;
+  const note=document.getElementById('conn-note').value.trim();
+  if(!DB.connections)DB.connections=[];
+  DB.connections.push({id:Date.now(),from:currentDetailId,to,type,note});
+  saveDB();document.getElementById('conn-modal-bg').classList.remove('open');openDetail(currentDetailId);showToast('Conexión agregada');
+}
+
+// ===== DETAIL =====
+function openDetail(id){
+  const e=DB.events.find(x=>x.id===id);if(!e)return;
+  currentDetailId=id;
+  const col=TYPE_COL[e.type]||regionColor(e.regions);
+  document.getElementById('dp-title').textContent=e.title;
+  const isAlive=(e.type==='personaje'||e.type==='pais')&&(!e.dateEnd||!e.dateEnd.year);
+  const dateStr=(e.dateEnd&&e.dateEnd.year)||isAlive?`${formatDate(e.dateStart)} — ${isAlive?'presente':formatDate(e.dateEnd)}`:formatDate(e.dateStart);
+  const bmBtn=document.getElementById('dp-bm-btn');
+  bmBtn.querySelector('i').className=`ti ti-bookmark${e.bookmarked?'-filled':''}`;
+  bmBtn.style.color=e.bookmarked?'var(--gold)':'';
+  const extras=[];
+  if(e.origin)extras.push(`<strong>Origen:</strong> ${e.origin}`);
+  if(e.role)extras.push(`<strong>Rol:</strong> ${e.role}`);
+  if(e.capital)extras.push(`<strong>Capital:</strong> ${e.capital}`);
+  if(e.government)extras.push(`<strong>Gobierno:</strong> ${e.government}`);
+  if(e.author)extras.push(`<strong>Autor/Dir.:</strong> ${e.author}`);
+  if(e.sourceType)extras.push(`<strong>Tipo:</strong> ${e.sourceType}`);
+  if(e.topic)extras.push(`<strong>Narra:</strong> ${e.topic}`);
+  document.getElementById('dp-meta').innerHTML=`
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px">
+      <span class="type-badge" style="background:${typeBG(e.type)};color:${col};border-color:${typeBD(e.type)}">${TYPE_LBL[e.type]||'Suceso'}</span>
+      <span class="tag" style="background:var(--bg2);color:var(--text2);border-color:var(--border)">${dateStr}</span>
+      ${isAlive?'<span class="tag" style="background:var(--success-bg);color:var(--success);border-color:var(--success-border);font-weight:600">activo</span>':''}
+    </div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:${extras.length?'6px':'0'}">
+      ${(e.regions||[]).map(r=>`<span class="tag" style="background:${regionColor([r])}22;color:${regionColor([r])};border-color:${regionColor([r])}55">${r}</span>`).join('')}
+      ${(e.cats||[]).map(c=>`<span class="tag" style="background:${col}22;color:${col};border-color:${col}55">${c}</span>`).join('')}
+    </div>
+    ${extras.length?`<div style="font-size:11px;color:var(--text2);line-height:1.7">${extras.join(' · ')}</div>`:''}
+    ${e.link?`<a href="${e.link}" target="_blank" style="font-size:11px;color:var(--info);display:inline-flex;align-items:center;gap:3px;margin-top:4px"><i class="ti ti-external-link" style="font-size:12px"></i>${e.link.substring(0,40)}...</a>`:''}
+    ${e.geo?`<br><button onclick="openMapModal(${e.id})" class="btn-s" style="margin-top:7px;font-size:11px;padding:4px 10px"><i class="ti ti-map-pin" style="font-size:12px"></i> Ver en mapa</button>`:''}
+  `;
+  const nw=document.getElementById('dp-notes-wrap');
+  if(e.notes||e.description){nw.style.display='block';document.getElementById('dp-notes').textContent=e.notes||e.description;}
+  else nw.style.display='none';
+  const mw=document.getElementById('dp-media-wrap');
+  if((e.media||[]).length){
+    mw.style.display='block';
+    document.getElementById('dp-media').innerHTML=(e.media||[]).map(m=>`<div class="ref-card">
+      <span class="ref-lbl">${m.type}</span>
+      <span style="font-size:11px;flex:1;line-height:1.4;word-break:break-word">${m.value}</span>
+      ${m.value.startsWith('http')?`<a href="${m.value}" target="_blank" class="btn-icon"><i class="ti ti-external-link" style="font-size:13px"></i></a>`:''}
+    </div>`).join('');
+  } else mw.style.display='none';
+  const conns=(DB.connections||[]).filter(c=>c.from===id||c.to===id);
+  document.getElementById('dp-conns').innerHTML=conns.map(c=>{
+    const other=DB.events.find(x=>x.id===(c.from===id?c.to:c.from));if(!other)return'';
+    return`<div class="conn-item" onclick="openDetail(${other.id})"><i class="ti ti-arrow-right" style="font-size:12px;color:var(--text3)"></i><div style="flex:1;font-size:12px">${other.title}</div><span class="tag" style="background:var(--bg2);color:var(--text3);border-color:var(--border)">${c.type}</span></div>`;
+  }).join('');
+  document.getElementById('ai-out').className='ai-out';
+  document.getElementById('ai-out').textContent='';
+  document.getElementById('suggest-list').style.display='none';
+  document.getElementById('detail-overlay').classList.add('open');
+  document.getElementById('detail-panel').classList.add('open');
+}
+function closeDetail(){document.getElementById('detail-overlay').classList.remove('open');document.getElementById('detail-panel').classList.remove('open');currentDetailId=null;}
+function toggleBookmark(){
+  if(!currentDetailId)return;const e=DB.events.find(x=>x.id===currentDetailId);if(!e)return;
+  e.bookmarked=!e.bookmarked;saveDB();openDetail(currentDetailId);renderTimeline();
+  showToast(e.bookmarked?'Marcado':'Marca removida');
+}
+function editEntry(){
+  if(!currentDetailId)return;const e=DB.events.find(x=>x.id===currentDetailId);if(!e)return;
+  closeDetail();currentEditId=e.id;nav('agregar');prepareForm(e.type||'suceso');
+  setTimeout(()=>{
+    const set=(id,val)=>{const el=document.getElementById(id);if(el&&val!==undefined&&val!==null&&String(val).trim())el.value=val;};
+    set('f-title',e.title);set('f-notes',e.notes);set('f-geo',e.geo);
+    set('f-origin',e.origin);set('f-role',e.role);set('f-characteristics',e.characteristics);
+    set('f-description',e.description);set('f-capital',e.capital);set('f-government',e.government);
+    set('f-author',e.author);set('f-topic',e.topic);set('f-link',e.link);
+    if(e.sourceType){const s=document.getElementById('f-source-type');if(s)s.value=e.sourceType;}
+    if(e.dateStart){set('f-day',e.dateStart.day);set('f-year',e.dateStart.year);monthPickerInstances['f-month']?.setVal(e.dateStart.month);}
+    if(e.dateEnd){set('f-day-end',e.dateEnd.day);set('f-year-end',e.dateEnd.year);monthPickerInstances['f-month-end']?.setVal(e.dateEnd.month);}
+    if(e.dateStart?.raw)set('f-date-approx-start',e.dateStart.raw);
+    if(e.dateEnd?.raw)set('f-date-approx-end',e.dateEnd.raw);
+    entryRegions=[...(e.regions||[])];renderRegionTags();
+    // Restore media
+    (e.media||[]).forEach(m=>{
+      const container=document.getElementById('mi-'+m.type);
+      if(!container)return;
+      // Find first empty input or add new one
+      const ids=entryMediaGroups[m.type]||[];
+      const emptyId=ids.find(id=>{const el=document.getElementById(id);return el&&!el.value;});
+      if(emptyId){const el=document.getElementById(emptyId);if(el)el.value=m.value;}
+      else addMediaItem(m.type);
+      setTimeout(()=>{
+        const ids2=entryMediaGroups[m.type]||[];
+        const lastId=ids2[ids2.length-1];
+        if(lastId){const el=document.getElementById(lastId);if(el&&!el.value)el.value=m.value;}
+      },50);
+    });
+    setTimeout(()=>{document.querySelectorAll('[data-cat]').forEach(c=>c.classList.toggle('on',(e.cats||[]).includes(c.dataset.cat)));},100);
+    document.getElementById('agregar-title').textContent='Editar — '+TYPE_LBL[e.type||'suceso'];
+    document.getElementById('save-lbl').textContent='Guardar cambios';
+  },130);
+}
+function deleteEntry(){
+  if(!currentDetailId)return;if(!confirm('¿Eliminar esta entrada?'))return;
+  DB.events=DB.events.filter(x=>x.id!==currentDetailId);
+  DB.connections=(DB.connections||[]).filter(c=>c.from!==currentDetailId&&c.to!==currentDetailId);
+  saveDB();closeDetail();renderTimeline();showToast('Eliminado');
+}
+
+// ===== MAP =====
+function openMapModal(id){
+  const e=DB.events.find(x=>x.id===id)||(currentDetailId?DB.events.find(x=>x.id===currentDetailId):null);
+  const q=e?(e.geo||(e.regions||[]).join(', ')||e.title):'mundo';
+  document.getElementById('map-iframe').src=`https://maps.google.com/maps?q=${encodeURIComponent(q)}&output=embed`;
+  document.getElementById('map-desc').textContent=e?`${e.title} — ${(e.regions||[]).join(', ')||'—'}`:'Vista global';
+  document.getElementById('map-modal-bg').classList.add('open');
+}
+
+// ===== AI =====
+async function callClaude(prompt){
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();return d.content?.[0]?.text||'Sin respuesta.';
+  }catch(e){return 'El asistente de IA funciona cuando la app está en un servidor web con HTTPS.';}
+}
+function getEvt(){return DB.events.find(x=>x.id===currentDetailId);}
+async function aiBtnFn(id,fn){
+  const btn=document.getElementById(id);btn.classList.add('loading');
+  const out=document.getElementById('ai-out');out.className='ai-out show';out.textContent='Procesando…';
+  out.textContent=await fn();btn.classList.remove('loading');
+}
+async function aiSummaryEvent(){
+  await aiBtnFn('btn-sum-evt',async()=>{
+    const e=getEvt();if(!e)return'—';
+    const mc=(e.media||[]).map(m=>`${m.type}: ${m.value}`).join(', ');
+    return callClaude(`Explicá en 3-4 párrafos: "${e.title}" (${formatDate(e.dateStart)}, ${(e.regions||[]).join(', ')||'—'}). Tipo: ${TYPE_LBL[e.type]}. ${e.description||''} ${mc?'Fuentes: '+mc:''} En español, tono educativo.`);
+  });
+}
+async function aiSummaryLearned(){
+  await aiBtnFn('btn-sum-learn',async()=>{
+    const e=getEvt();if(!e)return'—';
+    const mc=(e.media||[]).map(m=>`${m.type}: ${m.value}`).join(', ');
+    if(!e.notes&&!e.description&&!(e.media||[]).length)return'No hay notas ni referencias todavía.';
+    return callClaude(`Soy estudiante. Sobre "${e.title}": Notas: "${e.notes||e.description||'ninguna'}". Material: ${mc||'ninguno'}. Resumí SOLO lo que estudié, tono personal, 3-4 oraciones. En español.`);
+  });
+}
+async function aiSpeak(){
+  const out=document.getElementById('ai-out');const text=out.textContent;
+  if(!text||!out.classList.contains('show')){out.className='ai-out show';out.textContent='Generá un resumen primero.';return;}
+  const elKey=localStorage.getItem('el_api_key');
+  if(elKey){
+    try{
+      out.textContent='Generando audio con ElevenLabs…';
+      const r=await fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM',{method:'POST',headers:{'Content-Type':'application/json','xi-api-key':elKey},body:JSON.stringify({text,model_id:'eleven_multilingual_v2',voice_settings:{stability:.5,similarity_boost:.75}})});
+      if(r.ok){const blob=await r.blob();new Audio(URL.createObjectURL(blob)).play();out.textContent=text+'\n\n▶ Reproduciendo con ElevenLabs...';return;}
+    }catch(err){}
+  }
+  if('speechSynthesis' in window){
+    const u=new SpeechSynthesisUtterance(text);u.lang='es-AR';u.rate=0.9;
+    const voices=speechSynthesis.getVoices();const esp=voices.find(v=>v.lang.startsWith('es'));if(esp)u.voice=esp;
+    speechSynthesis.cancel();speechSynthesis.speak(u);out.textContent=text+'\n\n▶ Reproduciendo...';
+  }
+}
+async function aiSuggest(){
+  const e=getEvt();if(!e)return;
+  const btn=document.getElementById('btn-suggest');btn.classList.add('loading');
+  const out=document.getElementById('ai-out');out.className='ai-out show';out.textContent='Buscando sugerencias…';
+  const result=await callClaude(`Para "${e.title}" (${formatDate(e.dateStart)}, ${(e.regions||[]).join(', ')}), sugerí en JSON sin markdown:\n[{"tipo":"película","titulo":"...","descripcion":"..."},{"tipo":"libro","titulo":"...","descripcion":"..."},{"tipo":"documental","titulo":"...","descripcion":"..."},{"tipo":"tema_relacionado","titulo":"...","descripcion":"..."},{"tipo":"personaje","titulo":"...","descripcion":"..."}]`);
+  btn.classList.remove('loading');
+  try{
+    const items=JSON.parse(result.replace(/```json|```/g,'').trim());
+    out.textContent='';
+    const sl=document.getElementById('suggest-list');sl.style.display='block';
+    sl.innerHTML='<div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:6px">Sugerencias</div>'+
+    items.map(it=>`<div class="suggest-item"><div style="flex:1"><div style="font-size:10px;color:var(--text3);margin-bottom:1px">${it.tipo}</div><div style="font-size:12px;font-weight:600">${it.titulo}</div><div style="font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4">${it.descripcion}</div></div><button class="suggest-add" onclick="addSuggToPending('${it.titulo.replace(/'/g,"\\'")}','${it.tipo}')">+ Pendientes</button></div>`).join('');
+  }catch(err){out.textContent=result;}
+}
+async function aiSources(){
+  await aiBtnFn('btn-sources',async()=>{
+    const e=getEvt();if(!e)return'—';
+    const result=await callClaude(`Para "${e.title}" (${formatDate(e.dateStart)}), buscá fuentes en múltiples idiomas. JSON sin markdown:\n[{"nombre":"...","tipo":"wikipedia|academia|periodismo|blog|youtube","url":"...","idioma":"es|en|fr|de|ar|zh","credibilidad":"alta|media|baja","razon":"breve justificación"}]\nIncluí al menos 3 idiomas. Solo JSON.`);
+    try{
+      const items=JSON.parse(result.replace(/```json|```/g,'').trim());
+      const sl=document.getElementById('suggest-list');sl.style.display='block';
+      sl.innerHTML='<div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:6px">Fuentes</div>'+
+      items.map(s=>{const cc=s.credibilidad==='alta'?'cred-g':s.credibilidad==='media'?'cred-y':'cred-r';
+        return`<div class="ref-card" style="flex-direction:column;align-items:flex-start;gap:4px"><div style="display:flex;align-items:center;gap:6px;width:100%"><span style="font-size:12px;font-weight:600;flex:1">${s.nombre}</span><span class="${cc}">${s.credibilidad}</span><span class="tag" style="background:var(--bg2);color:var(--text3);border-color:var(--border)">${s.idioma.toUpperCase()}</span></div><div style="font-size:10px;color:var(--text3)">${s.razon}</div>${s.url?.startsWith('http')?`<a href="${s.url}" target="_blank" style="font-size:10px;color:var(--info);display:inline-flex;align-items:center;gap:3px"><i class="ti ti-external-link" style="font-size:11px"></i>${s.url.substring(0,40)}...</a>`:''}</div>`;
+      }).join('');
+      return '';
+    }catch(err){return result;}
+  });
+}
+async function aiNarrative(){
+  await aiBtnFn('btn-narrative',async()=>{
+    const e=getEvt();if(!e)return'—';
+    const conns=(DB.connections||[]).filter(c=>c.from===e.id||c.to===e.id);
+    const connTitles=conns.map(c=>{const o=DB.events.find(x=>x.id===(c.from===e.id?c.to:c.from));return o?o.title:'';}).filter(Boolean);
+    const mc=(e.media||[]).map(m=>`${m.type}: ${m.value}`).join(', ');
+    return callClaude(`Narrativa histórica (2-3 párrafos) sobre "${e.title}" (${formatDate(e.dateStart)}, ${(e.regions||[]).join(', ')}). ${e.notes?'Notas: '+e.notes:''} ${connTitles.length?'Conexiones: '+connTitles.join(', '):''} ${mc?'Fuentes: '+mc:''} Tono ameno. En español.`);
+  });
+}
+async function aiMeContext(){
+  const me=DB.me;if(!me?.year){showToast('Completá tu perfil primero');return;}
+  const btn=document.getElementById('btn-me-context');btn.classList.add('loading');
+  const evts=DB.events.filter(e=>e.dateStart?.year>=me.year).map(e=>e.title).slice(0,10);
+  const result=await callClaude(`Una persona nació en ${me.year} en ${me.place||'Argentina'}. Tiene ${CURRENT_YEAR-me.year} años. Su bitácora incluye: ${evts.join(', ')||'varios eventos'}. Escribí un párrafo reflexivo sobre qué significa nacer en ese año y cómo los eventos históricos de su vida se relacionan. Tono personal. En español.`);
+  document.getElementById('me-context').textContent=result;
+  btn.classList.remove('loading');
+}
+async function geoSuggest(){
+  const title=document.getElementById('f-title')?.value.trim()||'';
+  const regions=entryRegions.join(', ');
+  if(!title&&!regions){showToast('Ingresá el nombre primero');return;}
+  const gs=document.getElementById('geo-status');if(gs)gs.textContent='Consultando…';
+  const res=await callClaude(`Para "${title}" en "${regions||'sin región'}": devolvé SOLO lat, lng. Ejemplo: 48.8566, 2.3522`);
+  const geo=document.getElementById('f-geo');if(geo)geo.value=res.trim();
+  if(gs)gs.textContent='Sugerido por IA.';
+}
+function addSuggToPending(titulo,tipo){
+  DB.pending.push({id:Date.now(),nombre:titulo,epoca:'',escala:tipo==='personaje'?'personaje':tipo==='tema_relacionado'?'proceso histórico':'evento puntual',disparador:'',ref:'',relacion:'Sugerido por IA',created:new Date().toISOString()});
+  saveDB();showToast(`"${titulo}" agregado a pendientes`);
+}
+
+// ===== VOICE =====
+function toggleRecording(){
+  if(isRecording){if(recognition)recognition.stop();return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){document.getElementById('voice-status').textContent='Usá Chrome para reconocimiento de voz.';return;}
+  recognition=new SR();recognition.lang='es-AR';recognition.continuous=false;recognition.interimResults=true;
+  recognition.onstart=()=>{isRecording=true;document.getElementById('voice-btn').classList.add('recording');document.getElementById('voice-btn').querySelector('i').className='ti ti-player-stop';document.getElementById('voice-status').textContent='Escuchando…';document.getElementById('voice-transcript').style.display='block';};
+  recognition.onresult=ev=>{let t='';for(let i=ev.resultIndex;i<ev.results.length;i++)t+=ev.results[i][0].transcript;document.getElementById('voice-transcript').textContent=t;};
+  recognition.onend=async()=>{
+    isRecording=false;document.getElementById('voice-btn').classList.remove('recording');document.getElementById('voice-btn').querySelector('i').className='ti ti-microphone';
+    const transcript=document.getElementById('voice-transcript').textContent.trim();
+    if(!transcript){document.getElementById('voice-status').textContent='No se detectó audio.';return;}
+    const type=document.getElementById('current-type').value||'suceso';
+    if(document.getElementById('toggle-ai-class')?.checked)await autoFillForm(transcript,type);
+    else{const t=document.getElementById('f-title');if(t)t.value=transcript;}
+  };
+  recognition.start();
+}
+
+// ===== QUICK IDEA =====
+function openQuickModal(){clearQIForm();document.getElementById('qi-bg').classList.add('open');}
+function closeQuickModal(){document.getElementById('qi-bg').classList.remove('open');clearQIForm();}
+function clearQIForm(){
+  ['qi-title','qi-epoca','qi-ref','qi-relacion'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('qi-escala').value='';
+  document.querySelectorAll('#qi-disp [data-disp].on').forEach(c=>c.classList.remove('on'));
+  document.getElementById('qi-status').textContent='Tocá para dictar tu idea histórica';
+  document.getElementById('qi-transcript').style.display='none';document.getElementById('qi-transcript').textContent='';
+  document.getElementById('qi-save-btn').onclick=saveQuickIdea;
+}
+function toggleQIDisp(el){document.querySelectorAll('#qi-disp [data-disp]').forEach(c=>c.classList.remove('on'));el.classList.toggle('on');}
+function saveQuickIdea(){
+  const title=document.getElementById('qi-title').value.trim();if(!title){showToast('Ingresá el tema');return;}
+  const disp=document.querySelector('#qi-disp [data-disp].on');
+  DB.pending.push({id:Date.now(),nombre:title,epoca:document.getElementById('qi-epoca').value.trim(),escala:document.getElementById('qi-escala').value,disparador:disp?disp.dataset.disp:'',ref:document.getElementById('qi-ref').value.trim(),relacion:document.getElementById('qi-relacion').value.trim(),created:new Date().toISOString()});
+  saveDB();closeQuickModal();renderPending();showToast('Idea guardada en pendientes');
+}
+function toggleQIRec(){
+  if(qiRecording){if(qiRec)qiRec.stop();return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
+  qiRec=new SR();qiRec.lang='es-AR';qiRec.continuous=false;qiRec.interimResults=true;
+  qiRec.onstart=()=>{qiRecording=true;document.getElementById('qi-vbtn').classList.add('recording');document.getElementById('qi-vbtn').querySelector('i').className='ti ti-player-stop';document.getElementById('qi-status').textContent='Escuchando…';document.getElementById('qi-transcript').style.display='block';};
+  qiRec.onresult=ev=>{let t='';for(let i=ev.resultIndex;i<ev.results.length;i++)t+=ev.results[i][0].transcript;document.getElementById('qi-transcript').textContent=t;};
+  qiRec.onend=async()=>{
+    qiRecording=false;document.getElementById('qi-vbtn').classList.remove('recording');document.getElementById('qi-vbtn').querySelector('i').className='ti ti-microphone';
+    const transcript=document.getElementById('qi-transcript').textContent.trim();if(!transcript)return;
+    if(document.getElementById('toggle-ai-class')?.checked){
+      document.getElementById('qi-status').textContent='Clasificando…';
+      const prompt=`"${transcript}". JSON sin markdown:\n{"nombre":"tema","epoca":"época","escala":"civilización|proceso histórico|evento puntual|personaje","disparador":"conversación|película|libro|podcast|radio|noticiero|video","ref":"link o vacío","relacion":"conexión o vacío"}`;
+      try{
+        const res=await callClaude(prompt);const data=JSON.parse(res.replace(/```json|```/g,'').trim());
+        if(data.nombre)document.getElementById('qi-title').value=data.nombre;
+        if(data.epoca)document.getElementById('qi-epoca').value=data.epoca;
+        if(data.escala)document.getElementById('qi-escala').value=data.escala;
+        if(data.relacion)document.getElementById('qi-relacion').value=data.relacion;
+        if(data.ref)document.getElementById('qi-ref').value=data.ref;
+        if(data.disparador){document.querySelectorAll('#qi-disp [data-disp]').forEach(c=>c.classList.remove('on'));const ch=document.querySelector(`#qi-disp [data-disp="${data.disparador}"]`);if(ch)ch.classList.add('on');}
+        document.getElementById('qi-status').textContent='Clasificado. Revisá y guardá.';
+      }catch(e){document.getElementById('qi-status').textContent='Completá manualmente.';}
+    } else document.getElementById('qi-title').value=transcript;
+  };
+  qiRec.start();
+}
+
+// ===== CONFIG =====
+function toggleEL(){const on=document.getElementById('toggle-el').checked;document.getElementById('el-key-wrap').style.display=on?'block':'none';const s=localStorage.getItem('el_api_key');if(s&&on)document.getElementById('el-key').value=s;}
+function saveELKey(){const k=document.getElementById('el-key').value.trim();if(k){localStorage.setItem('el_api_key',k);showToast('Key guardada');}}
+function exportData(){const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bitacora_v6_'+new Date().toISOString().split('T')[0]+'.json';a.click();showToast('Datos exportados');}
+function importData(){document.getElementById('import-file').click();}
+function handleImport(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!confirm(`Importar ${(data.events||[]).length} entradas y ${(data.pending||[]).length} pendientes?`))return;
+      if(data.events){
+        data.events.forEach(e=>{if(e.media&&!Array.isArray(e.media))e.media=Object.entries(e.media).map(([type,value])=>({type,value}));});
+        DB.events=[...DB.events,...data.events.filter(ne=>!DB.events.find(e=>e.id===ne.id))];
+      }
+      if(data.pending)DB.pending=[...DB.pending,...data.pending.filter(np=>!DB.pending.find(p=>p.id===np.id))];
+      if(data.categories)DB.categories=[...new Set([...DB.categories,...data.categories])];
+      if(data.connections)DB.connections=[...(DB.connections||[]),...(data.connections||[])];
+      if(data.me&&!DB.me)DB.me=data.me;
+      saveDB();renderTimeline();showToast('Importado correctamente');
+    }catch(err){showToast('Error al leer el archivo');}
+  };
+  reader.readAsText(file);ev.target.value='';
+}
+function clearData(){
+  if(!confirm('¿Borrar TODO? No se puede deshacer.'))return;
+  DB={events:[],pending:[],categories:['política','guerra','cultura','ciencia','religión','economía','sociedad'],connections:[],me:null};
+  saveDB();renderTimeline();renderPending();showToast('Datos borrados');
+}
+
+// ===== INIT =====
+const elKey=localStorage.getItem('el_api_key');
+if(elKey){document.getElementById('toggle-el').checked=true;document.getElementById('el-key-wrap').style.display='block';document.getElementById('el-key').value=elKey;}
+window.addEventListener('resize',()=>{if(document.getElementById('screen-bitacora')?.classList.contains('active'))renderHTL();});
+</script>
+</body>
+</html>
