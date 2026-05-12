@@ -951,8 +951,11 @@ onAuthStateChanged(auth,async user=>{
         DB.categories=data.categories||['política','guerra','cultura','ciencia','religión','economía','sociedad'];
         DB.connections=data.connections||[];
         DB.me=data.me||null;
-        window.renderTimeline();window.renderPending();window.updatePendDot();window.updateStats();
-        if(document.getElementById('screen-yo').classList.contains('active'))window.renderMe();
+        if(window.renderTimeline)window.renderTimeline();
+        if(window.renderPending)window.renderPending();
+        if(window.updatePendDot)window.updatePendDot();
+        if(window.updateStats)window.updateStats();
+        if(document.getElementById('screen-yo').classList.contains('active')&&window.renderMe)window.renderMe();
         setSyncStatus('ok');
       } else {
         // First time user
@@ -2489,12 +2492,13 @@ function clearData(){
 }
 
 // ===== EXPOSE TO WINDOW (needed by Firebase module) =====
-window.renderTimeline=()=>renderTimeline();
-window.renderPending=()=>renderPending();
-window.updatePendDot=()=>updatePendDot();
-window.updateStats=()=>updateStats();
-window.renderMe=()=>renderMe();
-window.showToast=(m)=>showToast(m);
+// Direct references — no wrappers to avoid infinite recursion
+window.renderTimeline=renderTimeline;
+window.renderPending=renderPending;
+window.updatePendDot=updatePendDot;
+window.updateStats=updateStats;
+window.renderMe=renderMe;
+window.showToast=showToast;
 window.DB=DB;
 
 // ===== LOGOS SVG =====
