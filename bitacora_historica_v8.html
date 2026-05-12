@@ -1703,7 +1703,7 @@ function renderHTL(){
   const hiddenLabels=window.HTL_HIDDEN_LABELS||new Set();
   placements.forEach(p=>{
     const {e,col,x,lane,group,isAlive,isConcept}=p;
-    const dateStr=formatDate(e.dateStart)+(e.dateEnd?.year||isAlive?` — ${isAlive?'presente':formatDate(e.dateEnd)}':'');
+    const dateStr=formatDate(e.dateStart)+(e.dateEnd?.year||isAlive?' — '+(isAlive?'presente':formatDate(e.dateEnd)):'');
     const tipData=encodeURIComponent(JSON.stringify({t:e.title,d:dateStr}));
     const hidden=hiddenLabels.has(e.id)?'lbl-hidden':'';
     const idStr=`htl-item-${e.id}`;
